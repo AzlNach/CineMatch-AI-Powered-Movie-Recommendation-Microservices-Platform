@@ -6,9 +6,11 @@ const dataAnalyzer = require('../utils/dataAnalyzer');
 const USER_SERVICE = 'http://localhost:3001';
 const MOVIE_SERVICE = 'http://localhost:3002';
 const BOOKING_SERVICE = 'http://localhost:3004';
+const NOTIFICATION_SERVICE = 'http://localhost:3006';
 
 // Store user interactions for AI analysis
 const userInteractions = [];
+let analysisResults = null;
 
 exports.getUserRecommendations = async (req, res) => {
   try {
@@ -119,6 +121,51 @@ exports.trackUserInteraction = (req, res) => {
   });
 };
 
+exports.analyzeBookingData = async (req, res) => {
+  try {
+    // Get all bookings (in a real app, this would call the booking service)
+    // For now, use the interactions that represent bookings
+    const bookingInteractions = userInteractions.filter(
+      i => i.interactionType === 'booking'
+    );
+    
+    // Get all movies
+    const moviesResponse = await axios.get(`${MOVIE_SERVICE}/movies`);
+    const movies = moviesResponse.data;
+    
+    // Analyze booking patterns
+    const analysis = {
+      totalBookings: bookingInteractions.length,
+      moviePopularity: analyzeMoviePopularity(bookingInteractions, movies),
+      userPreferences: analyzeUserPreferences(bookingInteractions, movies),
+      timestamp: new Date().toISOString()
+    };
+    
+    // Store analysis results
+    analysisResults = analysis;
+    
+    // Send recommendations to users based on analysis
+    await sendRecommendationsToUsers(analysis);
+    
+    res.json({
+      success: true,
+      message: 'Analysis completed and recommendations sent',
+      analysisId: Date.now()
+    });
+  } catch (error) {
+    console.error('Error analyzing booking data:', error);
+    res.status(500).json({ error: 'Failed to analyze booking data' });
+  }
+};
+
+exports.getAnalysisReport = (req, res) => {
+  if (!analysisResults) {
+    return res.status(404).json({ error: 'No analysis results available' });
+  }
+  
+  res.json(analysisResults);
+};
+
 // Helper function to get user booking history
 async function getUserBookingHistory(userId) {
   try {
@@ -130,5 +177,110 @@ async function getUserBookingHistory(userId) {
   } catch (error) {
     console.error('Error fetching user booking history:', error);
     return [];
+  }
+}
+
+// Analyze movie popularity from bookings
+function analyzeMoviePopularity(bookings, movies) {
+  const movieCounts = {};
+  
+  bookings.forEach(booking => {
+    const { movieId } = booking;
+    movieCounts[movieId] = (movieCounts[movieId] || 0) + 1;
+  });
+  
+  return Object.entries(movieCounts)
+    .map(([movieId, count]) => {
+      const movie = movies.find(m => m.id == movieId);
+      return {
+        movieId: parseInt(movieId),
+        title: movie ? movie.title : 'Unknown Movie',
+        bookingCount: count
+      };
+    })
+    .sort((a, b) => b.bookingCount - a.bookingCount);
+}
+
+// Analyze user preferences from bookings
+function analyzeUserPreferences(bookings, movies) {
+  const userPreferences = {};
+  
+  bookings.forEach(booking => {
+    const { userId, movieId } = booking;
+    
+    if (!userPreferences[userId]) {
+      userPreferences[userId] = {
+        genres: {},
+        movies: []
+      };
+    }
+    
+    const movie = movies.find(m => m.id == movieId);
+    
+    if (movie) {
+      // Add movie to user's watched list
+      userPreferences[userId].movies.push(movieId);
+      
+      // Count genre preferences
+      movie.genres.forEach(genre => {
+        userPreferences[userId].genres[genre] = 
+          (userPreferences[userId].genres[genre] || 0) + 1;
+      });
+    }
+  });
+  
+  return Object.entries(userPreferences).map(([userId, preferences]) => {
+    // Find top genres
+    const topGenres = Object.entries(preferences.genres)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([genre, count]) => ({ genre, count }));
+    
+    return {
+      userId: parseInt(userId),
+      movieCount: preferences.movies.length,
+      topGenres
+    };
+  });
+}
+
+// Send personalized recommendations to users
+async function sendRecommendationsToUsers(analysis) {
+  try {
+    // For each user in the analysis
+    for (const userPref of analysis.userPreferences) {
+      // Get personalized recommendations
+      const userId = userPref.userId;
+      const userResponse = await axios.get(`${USER_SERVICE}/users/${userId}`);
+      const user = userResponse.data;
+      
+      const moviesResponse = await axios.get(`${MOVIE_SERVICE}/movies`);
+      const movies = moviesResponse.data;
+      
+      const userBookings = userInteractions.filter(
+        i => i.userId == userId && i.interactionType === 'booking'
+      );
+      
+      const recommendations = aiModel.generateRecommendations(
+        user,
+        movies,
+        userBookings,
+        userInteractions.filter(i => i.userId == userId)
+      );
+      
+      if (recommendations.length > 0) {
+        // Send notification with recommendations
+        const topRecommendation = recommendations[0];
+        
+        await axios.post(`${NOTIFICATION_SERVICE}/notifications`, {
+          userId,
+          type: 'recommendation',
+          title: 'Movie Recommendation Just For You!',
+          message: `Based on your taste, we think you'll love "${topRecommendation.movie.title}"`
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error sending recommendations to users:', error);
   }
 }

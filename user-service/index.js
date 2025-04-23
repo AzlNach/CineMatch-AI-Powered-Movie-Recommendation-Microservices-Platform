@@ -2,11 +2,10 @@ const express = require('express');
 const app = express();
 const port = 3001;
 
-app.use(express.json());
 
-const userRoutes = require('./routes/users');
-app.use('/users', userRoutes);
+app.use(express.json());
+app.use('/users', require('./routes/users'));
 
 app.listen(port, () => {
-  console.log(`User Service running on http://localhost:${port}`);
+  console.log(`User Service running at http://localhost:${port}`);
 });

@@ -11,6 +11,12 @@ router.get('/similar/:movieId', recommendationController.getSimilarMovies);
 // Get trending recommendations
 router.get('/trending', recommendationController.getTrendingMovies);
 
+// Analyze booking data
+router.post('/analyze', recommendationController.analyzeBookingData);
+
+// Get analysis report
+router.get('/analysis/report', recommendationController.getAnalysisReport);
+
 // Track user interaction for improving recommendations
 router.post('/interaction', recommendationController.trackUserInteraction);
 
