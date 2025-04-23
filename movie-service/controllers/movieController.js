@@ -29,14 +29,3 @@ exports.addMovies = (req, res) => {
     res.status(201).json(newMovie);
   }
 };
-
-
-
-
-// exports.addMovie = (req, res) => {
-//   const { title, schedule } = req.body;
-//   const newMovie = { id: movies.length + 1, title, schedule };
-//   movies.push(newMovie);
-
-//   res.status(201).json(newMovie);
-// };
