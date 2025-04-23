@@ -120,42 +120,13 @@ exports.addMovies = (req, res) => {
   }
 };
 
-// Update movie
-exports.updateMovie = (req, res) => {
-  const movieId = parseInt(req.params.id);
-  const movieIndex = movies.findIndex(m => m.id === movieId);
-  
-  if (movieIndex === -1) {
-    return res.status(404).json({ error: 'Movie not found' });
-  }
-  
-  const { title, description, duration, releaseDate, genres, rating, posterUrl, status } = req.body;
-  
-  movies[movieIndex] = {
-    ...movies[movieIndex],
-    ...(title && { title }),
-    ...(description && { description }),
-    ...(duration && { duration }),
-    ...(releaseDate && { releaseDate }),
-    ...(genres && { genres }),
-    ...(rating && { rating }),
-    ...(posterUrl && { posterUrl }),
-    ...(status && { status })
-  };
-  
-  res.json(movies[movieIndex]);
-};
 
-// Delete movie
-exports.deleteMovie = (req, res) => {
-  const movieId = parseInt(req.params.id);
-  const initialLength = movies.length;
-  
-  movies = movies.filter(m => m.id !== movieId);
-  
-  if (movies.length === initialLength) {
-    return res.status(404).json({ error: 'Movie not found' });
-  }
-  
-  res.json({ message: 'Movie deleted successfully' });
-};
+
+
+// exports.addMovie = (req, res) => {
+//   const { title, schedule } = req.body;
+//   const newMovie = { id: movies.length + 1, title, schedule };
+//   movies.push(newMovie);
+
+//   res.status(201).json(newMovie);
+// };
