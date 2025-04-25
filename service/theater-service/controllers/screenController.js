@@ -40,16 +40,20 @@ exports.getScreenById = async (req, res) => {
 // Create new screen
 exports.createScreen = async (req, res) => {
   try {
+    console.log('createScreen called with body:', JSON.stringify(req.body));
     const screenData = req.body;
     
+    // Check required fields
     if (!screenData.theater_id || !screenData.name || !screenData.capacity) {
-      return res.status(400).json({ error: 'Theater ID, name, and capacity are required' });
+      return res.status(400).json({ 
+        error: 'Theater ID, name, and capacity are required' 
+      });
     }
     
     // Verify theater exists
     const theater = await TheaterModel.getTheaterById(screenData.theater_id);
     if (!theater) {
-      return res.status(404).json({ error: 'Theater not found' });
+      return res.status(404).json({ error: 'Theater not found', theater_id: screenData.theater_id });
     }
     
     // Set default screen type if not provided
@@ -73,7 +77,7 @@ exports.createScreen = async (req, res) => {
     res.status(201).json(screen);
   } catch (error) {
     console.error('Error in createScreen:', error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 };
 

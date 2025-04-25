@@ -38,18 +38,46 @@ exports.getSeatById = async (req, res) => {
 };
 
 // Create new seat
+// Create new seat
+// Create new seat
 exports.createSeat = async (req, res) => {
   try {
     const seatData = req.body;
     
+    // Validate required fields
     if (!seatData.screen_id || !seatData.row || !seatData.number) {
-      return res.status(400).json({ error: 'Screen ID, row, and number are required' });
+      return res.status(400).json({ 
+        success: false,
+        error: 'Screen ID, row, and number are required',
+        received: seatData
+      });
+    }
+    
+    // Validate data types
+    if (isNaN(parseInt(seatData.screen_id, 10))) {
+      return res.status(400).json({
+        success: false, 
+        error: 'Screen ID must be a number',
+        received: seatData.screen_id
+      });
+    }
+    
+    if (isNaN(parseInt(seatData.number, 10))) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Seat number must be a number',
+        received: seatData.number
+      });
     }
     
     // Verify screen exists
     const screen = await ScreenModel.getScreenById(seatData.screen_id);
     if (!screen) {
-      return res.status(404).json({ error: 'Screen not found' });
+      return res.status(404).json({ 
+        success: false,
+        error: 'Screen not found', 
+        screen_id: seatData.screen_id 
+      });
     }
     
     // Set default seat type if not provided
@@ -57,13 +85,59 @@ exports.createSeat = async (req, res) => {
       seatData.seat_type = 'standard';
     }
     
+    // Create the seat
     const seatId = await SeatModel.createSeat(seatData);
+    
+    // Check if seatId is valid
+    if (!seatId) {
+      return res.status(500).json({ 
+        success: false,
+        error: 'Failed to create seat' 
+      });
+    }
+    
+    // Retrieve the created seat
     const seat = await SeatModel.getSeatById(seatId);
     
-    res.status(201).json(seat);
+    // Verify the seat was retrieved successfully
+    if (!seat) {
+      return res.status(500).json({ 
+        success: false,
+        error: 'Seat created but could not be retrieved',
+        seatId
+      });
+    }
+    
+    res.status(201).json({
+      success: true,
+      message: 'Seat created successfully',
+      data: seat
+    });
   } catch (error) {
-    console.error('Error in createSeat:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error in createSeat:', error.message || error);
+    
+    // Handle specific errors with appropriate status codes
+    if (error.message.includes('already exists')) {
+      return res.status(409).json({ 
+        success: false,
+        error: 'Conflict', 
+        details: error.message
+      });
+    }
+    
+    if (error.message.includes('does not exist')) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'Not Found', 
+        details: error.message
+      });
+    }
+    
+    res.status(500).json({ 
+      success: false,
+      error: 'Server error', 
+      details: error.message
+    });
   }
 };
 
