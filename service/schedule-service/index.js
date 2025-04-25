@@ -11,7 +11,6 @@ app.use(cors());
 // Import routes
 const scheduleRoutes = require('./routes/schedules');
 
-app.use(cors());
 // Use routes
 app.use('/schedules', scheduleRoutes);
 

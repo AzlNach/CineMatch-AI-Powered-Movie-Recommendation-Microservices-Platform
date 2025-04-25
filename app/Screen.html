@@ -1,0 +1,1396 @@
+\app\Screen.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Management - CineMatch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --secondary-color: #ff4081;
+            --light-color: #f5f5f5;
+            --dark-color: #333;
+            --text-secondary: #757575;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .screen-card {
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .screen-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .badge-standard { background-color: #6c757d; color: white; }
+        .badge-imax { background-color: #007bff; color: white; }
+        .badge-4dx { background-color: #6f42c1; color: white; }
+        .badge-vip { background-color: #fd7e14; color: white; }
+        
+        /* Seat related styles */
+        .theater-preview {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .screen {
+            height: 10px;
+            background-color: #aaa;
+            margin: 0 auto 30px;
+            width: 80%;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+        }
+        
+        .screen-label {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .seat-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .seat-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .row-label {
+            width: 30px;
+            text-align: center;
+            color: #aaa;
+            margin-right: 10px;
+        }
+        
+        .seat {
+            width: 30px;
+            height: 30px;
+            margin: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .seat-standard {
+            background-color: #444;
+            color: #ddd;
+        }
+        
+        .seat-premium {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .seat-vip {
+            background-color: #fd7e14;
+            color: white;
+        }
+        
+        .seat-accessible {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .seat-unavailable {
+            background-color: #dc3545;
+            color: white;
+            cursor: not-allowed;
+        }
+        
+        .seat:hover:not(.seat-unavailable) {
+            transform: scale(1.15);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .seat-selected {
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        
+        .seat-type-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px 10px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="page-header">
+            <h1 class="page-title">Screen Management</h1>
+            <div class="date">Today: <span id="current-date"></span></div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" style="color: var(--primary-color); text-decoration: none;">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="Theater.html" style="color: var(--primary-color); text-decoration: none;">Theaters</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Screens</li>
+                </ol>
+            </nav>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createScreenModal">
+                <i class="fas fa-plus-circle"></i> Add New Screen
+            </button>
+        </div>
+
+        <div class="row" id="screensList">
+            <!-- Screen cards will be loaded here -->
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border" role="status" style="color: var(--primary-color);">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Screen Modal -->
+    <div class="modal fade" id="createScreenModal" tabindex="-1" aria-labelledby="createScreenModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createScreenModalLabel">Add New Screen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createScreenForm">
+                        <div class="mb-3">
+                            <label for="createTheaterId" class="form-label">Theater</label>
+                            <select class="form-select" id="createTheaterId" required>
+                                <!-- Theater options will be loaded here -->
+                                <option value="" disabled selected>Select a theater</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createName" class="form-label">Screen Name</label>
+                            <input type="text" class="form-control" id="createName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createCapacity" class="form-label">Capacity</label>
+                            <input type="number" class="form-control" id="createCapacity" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createScreenType" class="form-label">Screen Type</label>
+                            <select class="form-select" id="createScreenType">
+                                <option value="standard">Standard</option>
+                                <option value="imax">IMAX</option>
+                                <option value="4dx">4DX</option>
+                                <option value="vip">VIP</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 border p-3 rounded" style="background-color: var(--light-color);">
+                            <h6 style="color: var(--dark-color);">Seating Configuration (Optional)</h6>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label for="createRows" class="form-label">Number of Rows</label>
+                                    <input type="number" class="form-control" id="createRows" min="1">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="createSeatsPerRow" class="form-label">Seats Per Row</label>
+                                    <input type="number" class="form-control" id="createSeatsPerRow" min="1">
+                                </div>
+                            </div>
+                            <small class="text-muted">If provided, seats will be automatically created.</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="createScreen()">Create Screen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Screen Modal -->
+    <div class="modal fade" id="updateScreenModal" tabindex="-1" aria-labelledby="updateScreenModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateScreenModalLabel">Update Screen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateScreenForm">
+                        <input type="hidden" id="updateScreenId">
+                        <div class="mb-3">
+                            <label for="updateName" class="form-label">Screen Name</label>
+                            <input type="text" class="form-control" id="updateName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="updateCapacity" class="form-label">Capacity</label>
+                            <input type="number" class="form-control" id="updateCapacity" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="updateScreenType" class="form-label">Screen Type</label>
+                            <select class="form-select" id="updateScreenType">
+                                <option value="standard">Standard</option>
+                                <option value="imax">IMAX</option>
+                                <option value="4dx">4DX</option>
+                                <option value="vip">VIP</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="updateScreen()">Update Screen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteScreenModal" tabindex="-1" aria-labelledby="deleteScreenModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteScreenModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Are you sure you want to delete this screen? This action cannot be undone.
+                    </div>
+                    <p><strong>Note:</strong> Deleting a screen will also delete all associated seats and may affect scheduled showtimes.</p>
+                    <input type="hidden" id="deleteScreenId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteScreen()">
+                        <i class="fas fa-trash-alt me-1"></i> Delete Screen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Seats Modal -->
+    <div class="modal fade" id="manageSeatsModal" tabindex="-1" aria-labelledby="manageSeatsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manageSeatsModalLabel">Manage Screen Seats</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="seatsRows" class="form-label">Number of Rows</label>
+                                <input type="number" id="seatsRows" class="form-control" min="1" max="26" value="8">
+                                <small class="text-muted">Maximum 26 rows (A-Z)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="seatsPerRow" class="form-label">Seats Per Row</label>
+                                <input type="number" id="seatsPerRow" class="form-control" min="1" max="20" value="10">
+                                <small class="text-muted">Maximum 20 seats per row</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="theater-preview p-3 border rounded">
+                                <div class="screen-label">SCREEN</div>
+                                <div class="screen"></div>
+                                <div id="seatsPreview" class="seat-layout">
+                                    <!-- Seats will be generated here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">Seat Configuration</div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Selected Seat</label>
+                                        <div id="selectedSeatInfo" class="p-2 border rounded bg-light">
+                                            <p class="text-muted mb-0">No seat selected</p>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="seatType" class="form-label">Seat Type</label>
+                                        <select id="seatType" class="form-select" disabled>
+                                            <option value="standard">Standard</option>
+                                            <option value="premium">Premium</option>
+                                            <option value="vip">VIP</option>
+                                            <option value="accessible">Accessible</option>
+                                            <option value="unavailable">Unavailable</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <button id="applySeatType" class="btn btn-primary w-100" disabled>
+                                            Apply to Selected Seat
+                                        </button>
+                                    </div>
+                                    <div class="mb-3">
+                                        <button id="applyToRow" class="btn btn-outline-primary w-100" disabled>
+                                            Apply to Entire Row
+                                        </button>
+                                    </div>
+                                    <hr>
+                                    <div class="seat-type-legend">
+                                        <div class="legend-item">
+                                            <div class="legend-color seat-standard"></div>
+                                            <span>Standard</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-color seat-premium"></div>
+                                            <span>Premium</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-color seat-vip"></div>
+                                            <span>VIP</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-color seat-accessible"></div>
+                                            <span>Accessible</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-color seat-unavailable"></div>
+                                            <span>Unavailable</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-secondary" id="regenerateSeatsBtn">
+                        <i class="fas fa-sync-alt me-1"></i> Regenerate Layout
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveSeatsBtn">
+                        <i class="fas fa-save me-1"></i> Save Seats Configuration
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Seat Modal -->
+    <div class="modal fade" id="editSeatModal" tabindex="-1" aria-labelledby="editSeatModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSeatModalLabel">Edit Seat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editSeatForm">
+                        <input type="hidden" id="editSeatId">
+                        <div class="mb-3">
+                            <label for="editSeatRow" class="form-label">Row</label>
+                            <input type="text" class="form-control" id="editSeatRow" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSeatNumber" class="form-label">Seat Number</label>
+                            <input type="number" class="form-control" id="editSeatNumber" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSeatType" class="form-label">Seat Type</label>
+                            <select class="form-select" id="editSeatType" required>
+                                <option value="standard">Standard</option>
+                                <option value="premium">Premium</option>
+                                <option value="vip">VIP</option>
+                                <option value="accessible">Accessible</option>
+                                <option value="unavailable">Unavailable</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSeatPrice" class="form-label">Price Modifier (%)</label>
+                            <input type="number" class="form-control" id="editSeatPrice" min="0" max="200" value="100">
+                            <small class="text-muted">100% = standard price, 150% = 50% premium</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="updateSeat()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables to store data
+        let currentScreenId = null;
+        let screenSeats = [];
+        let selectedSeat = null;
+        
+        // Function to extract screen ID from URL if present
+        function getScreenIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+        
+        // Function to extract theater ID from URL if present
+        function getTheaterIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('theaterId');
+        }
+        
+        // Load screens from API
+        async function loadScreens() {
+            try {
+                // Get ID from URL parameter if available
+                const theaterId = getTheaterIdFromUrl();
+                const screenId = getScreenIdFromUrl();
+                let url;
+                
+                if (screenId) {
+                    // If specific screen ID is provided, load just that one
+                    url = `http://localhost:3003/screens/${screenId}`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch screen');
+                    }
+                    
+                    const screen = await response.json();
+                    displayScreens([screen]);
+                    currentScreenId = screenId;
+                    
+                    // Optionally show screen details automatically
+                    viewScreenDetails(screenId);
+                } else if (theaterId) {
+                    // If theater ID is provided, load screens for that theater
+                    url = `http://localhost:3003/screens/theater/${theaterId}`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch screens for theater');
+                    }
+                    
+                    const screens = await response.json();
+                    displayScreens(screens);
+                } else {
+                    // Otherwise load all screens
+                    url = 'http://localhost:3003/screens';
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch screens');
+                    }
+                    
+                    const screens = await response.json();
+                    displayScreens(screens);
+                }
+            } catch (error) {
+                console.error('Error loading screens:', error);
+                document.getElementById('screensList').innerHTML = `
+                    <div class="col-12 text-center">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Failed to load screens. ${error.message}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayScreens(screens) {
+            const screensList = document.getElementById('screensList');
+            
+            if (screens.length === 0) {
+                screensList.innerHTML = `
+                    <div class="col-12 text-center">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No screens found. Add a new screen to get started.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            screensList.innerHTML = screens.map(screen => `
+                <div class="col-md-4">
+                    <div class="card screen-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title mb-0">${screen.name}</h5>
+                                <span class="badge badge-${screen.screen_type}">${screen.screen_type}</span>
+                            </div>
+                            <p class="card-text mt-2">
+                                <i class="fas fa-chair me-2" style="color: var(--text-secondary);"></i>
+                                <strong>${screen.capacity}</strong> seats<br>
+                                <i class="fas fa-building me-2" style="color: var(--text-secondary);"></i>
+                                Theater ID: ${screen.theater_id}<br>
+                                <i class="fas fa-calendar-alt me-2" style="color: var(--text-secondary);"></i>
+                                Created: ${new Date(screen.created_at).toLocaleDateString()}
+                            </p>
+                            <div class="btn-group w-100 mb-2">
+                                <button type="button" class="btn btn-outline-primary" onclick="viewScreenDetails(${screen.id})">
+                                    <i class="fas fa-eye me-1"></i> View
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="prepareUpdateScreen(${screen.id})">
+                                    <i class="fas fa-edit me-1"></i> Edit
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" onclick="confirmDeleteScreen(${screen.id})">
+                                    <i class="fas fa-trash-alt me-1"></i> Delete
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-outline-success w-100" onclick="manageScreenSeats(${screen.id})">
+                                <i class="fas fa-chair me-1"></i> Manage Seats
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load theaters for dropdown
+        async function loadTheaters() {
+            try {
+                const response = await fetch('http://localhost:3003/theaters');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch theaters');
+                }
+                
+                const theaters = await response.json();
+                const theaterSelect = document.getElementById('createTheaterId');
+                
+                // Clear existing options except the first placeholder
+                while (theaterSelect.options.length > 1) {
+                    theaterSelect.remove(1);
+                }
+                
+                theaters.forEach(theater => {
+                    const option = document.createElement('option');
+                    option.value = theater.id;
+                    option.textContent = theater.name;
+                    theaterSelect.appendChild(option);
+                });
+                
+                // If theater ID is in URL, select it
+                const theaterId = getTheaterIdFromUrl();
+                if (theaterId) {
+                    theaterSelect.value = theaterId;
+                }
+            } catch (error) {
+                console.error('Error loading theaters:', error);
+                showToast('Failed to load theaters', 'error');
+            }
+        }
+
+        // Create new screen
+        async function createScreen() {
+            try {
+                const theaterId = document.getElementById('createTheaterId').value;
+                const name = document.getElementById('createName').value;
+                const capacity = document.getElementById('createCapacity').value;
+                const screenType = document.getElementById('createScreenType').value;
+                const rows = document.getElementById('createRows').value;
+                const seatsPerRow = document.getElementById('createSeatsPerRow').value;
+                
+                if (!theaterId || !name || !capacity) {
+                    showToast('Please fill in all required fields', 'warning');
+                    return;
+                }
+                
+                const screenData = {
+                    theater_id: Number(theaterId),
+                    name,
+                    capacity: Number(capacity),
+                    screen_type: screenType
+                };
+                
+                // Add seating configuration if provided
+                if (rows && seatsPerRow) {
+                    screenData.rows = Number(rows);
+                    screenData.seats_per_row = Number(seatsPerRow);
+                }
+                
+                const response = await fetch('http://localhost:3003/screens/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(screenData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to create screen');
+                }
+                
+                // Close modal and reload screens
+                const modal = bootstrap.Modal.getInstance(document.getElementById('createScreenModal'));
+                modal.hide();
+                
+                // Reset form
+                document.getElementById('createScreenForm').reset();
+                
+                // Reload screens list
+                loadScreens();
+                
+                // Show success message
+                showToast('Screen created successfully!', 'success');
+            } catch (error) {
+                console.error('Error creating screen:', error);
+                showToast(`Failed to create screen: ${error.message}`, 'error');
+            }
+        }
+
+        // Prepare update screen modal with existing data
+        async function prepareUpdateScreen(screenId) {
+            try {
+                const response = await fetch(`http://localhost:3003/screens/${screenId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch screen details');
+                }
+                
+                const screen = await response.json();
+                
+                // Populate form with screen data
+                document.getElementById('updateScreenId').value = screen.id;
+                document.getElementById('updateName').value = screen.name;
+                document.getElementById('updateCapacity').value = screen.capacity;
+                document.getElementById('updateScreenType').value = screen.screen_type;
+                
+                // Show modal
+                const updateModal = new bootstrap.Modal(document.getElementById('updateScreenModal'));
+                updateModal.show();
+            } catch (error) {
+                console.error('Error preparing screen update:', error);
+                showToast(`Failed to load screen details: ${error.message}`, 'error');
+            }
+        }
+
+        // Update screen
+        async function updateScreen() {
+            try {
+                const screenId = document.getElementById('updateScreenId').value;
+                const name = document.getElementById('updateName').value;
+                const capacity = document.getElementById('updateCapacity').value;
+                const screenType = document.getElementById('updateScreenType').value;
+                
+                if (!name || !capacity) {
+                    showToast('Please fill in all required fields', 'warning');
+                    return;
+                }
+                
+                const screenData = {
+                    name,
+                    capacity: Number(capacity),
+                    screen_type: screenType
+                };
+                
+                const response = await fetch(`http://localhost:3003/screens/${screenId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(screenData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to update screen');
+                }
+                
+                // Close modal and reload screens
+                const modal = bootstrap.Modal.getInstance(document.getElementById('updateScreenModal'));
+                modal.hide();
+                
+                // Reload screens list
+                loadScreens();
+                
+                // Show success message
+                showToast('Screen updated successfully!', 'success');
+            } catch (error) {
+                console.error('Error updating screen:', error);
+                showToast(`Failed to update screen: ${error.message}`, 'error');
+            }
+        }
+
+        // Prepare delete confirmation modal
+        function confirmDeleteScreen(screenId) {
+            document.getElementById('deleteScreenId').value = screenId;
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteScreenModal'));
+            deleteModal.show();
+        }
+
+        // Delete screen
+        async function deleteScreen() {
+            try {
+                const screenId = document.getElementById('deleteScreenId').value;
+                
+                const response = await fetch(`http://localhost:3003/screens/${screenId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to delete screen');
+                }
+                
+                // Close modal and reload screens
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteScreenModal'));
+                modal.hide();
+                
+                // Reload screens list
+                loadScreens();
+                
+                // Show success message
+                showToast('Screen deleted successfully!', 'success');
+            } catch (error) {
+                console.error('Error deleting screen:', error);
+                showToast(`Failed to delete screen: ${error.message}`, 'error');
+            }
+        }
+
+        // View screen details
+        async function viewScreenDetails(screenId) {
+            try {
+                const response = await fetch(`http://localhost:3003/screens/${screenId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch screen details');
+                }
+                
+                const screen = await response.json();
+                
+                // Get seats for this screen
+                const seatsResponse = await fetch(`http://localhost:3003/screens/${screenId}/seats`);
+                let seatsData = [];
+                
+                if (seatsResponse.ok) {
+                    seatsData = await seatsResponse.json();
+                }
+                
+                // Get theater details for this screen
+                const theaterResponse = await fetch(`http://localhost:3003/theaters/${screen.theater_id}`);
+                let theaterName = "Unknown Theater";
+                
+                if (theaterResponse.ok) {
+                    const theater = await theaterResponse.json();
+                    theaterName = theater.name;
+                }
+                
+                // Display detailed information in a modal
+                const detailsModal = `
+                    <div class="modal fade" id="screenDetailsModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-tv me-2" style="color: var(--primary-color);"></i>
+                                        ${screen.name} Details
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="mb-3" style="color: var(--dark-color);">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                Basic Information
+                                            </h6>
+                                            <ul class="list-group mb-3">
+                                                <li class="list-group-item"><strong>ID:</strong> ${screen.id}</li>
+                                                <li class="list-group-item"><strong>Theater:</strong> ${theaterName} (ID: ${screen.theater_id})</li>
+                                                <li class="list-group-item">
+                                                    <strong>Screen Type:</strong> 
+                                                    <span class="badge badge-${screen.screen_type}">${screen.screen_type}</span>
+                                                </li>
+                                                <li class="list-group-item"><strong>Capacity:</strong> ${screen.capacity} seats</li>
+                                                <li class="list-group-item"><strong>Created:</strong> ${new Date(screen.created_at).toLocaleString()}</li>
+                                                <li class="list-group-item"><strong>Last Updated:</strong> ${screen.updated_at ? new Date(screen.updated_at).toLocaleString() : 'Never'}</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6 class="mb-3" style="color: var(--dark-color);">
+                                                <i class="fas fa-chair me-2"></i>
+                                                Seats Information
+                                            </h6>
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <p><strong>Total Seats:</strong> ${seatsData.length}</p>
+                                                    <div class="seat-type-breakdown">
+                                                        ${generateSeatTypeBreakdown(seatsData)}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <h6 class="mb-3" style="color: var(--dark-color);">
+                                            <i class="fas fa-th me-2"></i>
+                                            Seating Layout
+                                        </h6>
+                                        <div class="theater-preview border p-3 rounded">
+                                            <div class="screen-label">SCREEN</div>
+                                            <div class="screen"></div>
+                                            <div class="seat-layout">
+                                                ${generateSeatingLayout(seatsData)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-success" onclick="manageScreenSeats(${screen.id})">
+                                        <i class="fas fa-chair me-1"></i> Manage Seats
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="prepareUpdateScreen(${screen.id})">
+                                        <i class="fas fa-edit me-1"></i> Edit Screen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove any existing modal
+                const existingModal = document.getElementById('screenDetailsModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to document
+                document.body.insertAdjacentHTML('beforeend', detailsModal);
+                
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('screenDetailsModal'));
+                modal.show();
+            } catch (error) {
+                console.error('Error viewing screen details:', error);
+                showToast(`Failed to load screen details: ${error.message}`, 'error');
+            }
+        }
+
+        // Generate seat type breakdown HTML
+        function generateSeatTypeBreakdown(seats) {
+            if (!seats || seats.length === 0) {
+                return '<p class="text-muted">No seat information available</p>';
+            }
+            
+            const seatTypes = {};
+            
+            // Count seats by type
+            seats.forEach(seat => {
+                const type = seat.seat_type || 'standard';
+                if (!seatTypes[type]) {
+                    seatTypes[type] = 0;
+                }
+                seatTypes[type]++;
+            });
+            
+            // Generate HTML
+            let html = '<ul class="list-group">';
+            for (const [type, count] of Object.entries(seatTypes)) {
+                html += `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${type.charAt(0).toUpperCase() + type.slice(1)}
+                        <span class="badge rounded-pill seat-${type}">${count}</span>
+                    </li>
+                `;
+            }
+            html += '</ul>';
+            
+            return Object.keys(seatTypes).length > 0 ? html : '<p class="text-muted">No seat type information available</p>';
+        }
+
+        // Generate seating layout HTML
+        function generateSeatingLayout(seats) {
+            if (!seats || seats.length === 0) {
+                return '<div class="text-center py-3 text-muted"><i class="fas fa-exclamation-circle me-2"></i>No seats configured for this screen.</div>';
+            }
+            
+            // Group seats by row
+            const seatsByRow = {};
+            seats.forEach(seat => {
+                if (!seatsByRow[seat.row]) {
+                    seatsByRow[seat.row] = [];
+                }
+                seatsByRow[seat.row].push(seat);
+            });
+            
+            // Sort seats within each row
+            for (const row in seatsByRow) {
+                seatsByRow[row].sort((a, b) => a.number - b.number);
+            }
+            
+            // Generate HTML
+            let html = '';
+            
+            // Convert to array for sorting - ensure rows are in alphabetical order
+            const rows = Object.keys(seatsByRow).sort();
+            
+            rows.forEach(row => {
+                html += `<div class="seat-row">`;
+                html += `<div class="row-label">${row}</div>`;
+                
+                seatsByRow[row].forEach(seat => {
+                    const seatType = seat.seat_type || 'standard';
+                    html += `
+                        <div class="seat seat-${seatType}" 
+                             data-seat-id="${seat.id}"
+                             data-row="${seat.row}"
+                             data-number="${seat.number}"
+                             data-type="${seatType}"
+                             title="Seat ${row}${seat.number} (${seatType})">
+                            ${seat.number}
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            });
+            
+            return html;
+        }
+
+        // Manage seats for a screen
+        async function manageScreenSeats(screenId) {
+            try {
+                currentScreenId = screenId;
+                
+                // Get screen details
+                const screenResponse = await fetch(`http://localhost:3003/screens/${screenId}`);
+                if (!screenResponse.ok) {
+                    throw new Error('Failed to fetch screen details');
+                }
+                const screen = await screenResponse.json();
+                
+                // Set modal title
+                document.getElementById('manageSeatsModalLabel').innerHTML = `
+                    <i class="fas fa-chair me-2" style="color: var(--primary-color);"></i>
+                    Manage Seats for ${screen.name}
+                `;
+                
+                // Get existing seats for this screen
+                const seatsResponse = await fetch(`http://localhost:3003/screens/${screenId}/seats`);
+                
+                if (seatsResponse.ok) {
+                    screenSeats = await seatsResponse.json();
+                    
+                    // Calculate rows and seats per row if seats exist
+                    if (screenSeats.length > 0) {
+                        // Find the number of unique rows
+                        const rows = new Set(screenSeats.map(seat => seat.row)).size;
+                        
+                        // Estimate seats per row
+                        const seatsPerRow = Math.ceil(screenSeats.length / rows);
+                        
+                        // Set initial values in form
+                        document.getElementById('seatsRows').value = rows;
+                        document.getElementById('seatsPerRow').value = seatsPerRow;
+                    } else {
+                        // Default values if no seats
+                        document.getElementById('seatsRows').value = 8;
+                        document.getElementById('seatsPerRow').value = 10;
+                    }
+                } else {
+                    // If no seats yet, use default values
+                    screenSeats = [];
+                    document.getElementById('seatsRows').value = 8;
+                    document.getElementById('seatsPerRow').value = 10;
+                }
+                
+                // Generate initial seating layout
+                generateSeatsPreview();
+                
+                // Reset selection
+                selectedSeat = null;
+                updateSelectedSeatInfo();
+                
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('manageSeatsModal'));
+                modal.show();
+            } catch (error) {
+                console.error('Error loading screen seats:', error);
+                showToast(`Failed to load seats: ${error.message}`, 'error');
+            }
+        }
+
+        // Generate seats preview in manage seats modal
+        function generateSeatsPreview() {
+            const rows = parseInt(document.getElementById('seatsRows').value) || 8;
+            const seatsPerRow = parseInt(document.getElementById('seatsPerRow').value) || 10;
+            const container = document.getElementById('seatsPreview');
+            
+            container.innerHTML = '';
+            
+            // For each row (A, B, C, etc.)
+            for (let i = 0; i < rows; i++) {
+                const rowLetter = String.fromCharCode(65 + i); // A=65, B=66, etc.
+                
+                const rowElement = document.createElement('div');
+                rowElement.className = 'seat-row';
+                
+                const rowLabel = document.createElement('div');
+                rowLabel.className = 'row-label';
+                rowLabel.textContent = rowLetter;
+                rowElement.appendChild(rowLabel);
+                
+                // For each seat in this row
+                for (let j = 1; j <= seatsPerRow; j++) {
+                    // Check if this seat exists in our data
+                    const existingSeat = screenSeats.find(
+                        seat => seat.row === rowLetter && seat.number === j
+                    );
+                    
+                    const seatType = existingSeat ? (existingSeat.seat_type || 'standard') : 'standard';
+                    const seatId = existingSeat ? existingSeat.id : null;
+                    
+                    const seatElement = document.createElement('div');
+                    seatElement.className = `seat seat-${seatType}`;
+                    seatElement.textContent = j;
+                    seatElement.dataset.row = rowLetter;
+                    seatElement.dataset.number = j;
+                    seatElement.dataset.type = seatType;
+                    if (seatId) seatElement.dataset.seatId = seatId;
+                    
+                    seatElement.title = `Seat ${rowLetter}${j} (${seatType})`;
+                    
+                    // Add click event to select this seat
+                    seatElement.addEventListener('click', function() {
+                        // Remove selection from previously selected seat
+                        if (selectedSeat) {
+                            selectedSeat.classList.remove('seat-selected');
+                        }
+                        
+                        // Select this seat
+                        this.classList.add('seat-selected');
+                        selectedSeat = this;
+                        
+                        // Update selected seat info
+                        updateSelectedSeatInfo();
+                        
+                        // Enable editing controls
+                        document.getElementById('seatType').disabled = false;
+                        document.getElementById('applySeatType').disabled = false;
+                        document.getElementById('applyToRow').disabled = false;
+                        
+                        // Set the current type in dropdown
+                        document.getElementById('seatType').value = this.dataset.type;
+                    });
+                    
+                    rowElement.appendChild(seatElement);
+                }
+                
+                container.appendChild(rowElement);
+            }
+        }
+
+        // Update selected seat info display
+        function updateSelectedSeatInfo() {
+            const infoContainer = document.getElementById('selectedSeatInfo');
+            
+            if (!selectedSeat) {
+                infoContainer.innerHTML = `<p class="text-muted mb-0">No seat selected</p>`;
+                return;
+            }
+            
+            const row = selectedSeat.dataset.row;
+            const number = selectedSeat.dataset.number;
+            const type = selectedSeat.dataset.type;
+            
+            infoContainer.innerHTML = `
+                <p class="mb-1"><strong>Seat:</strong> ${row}${number}</p>
+                <p class="mb-1"><strong>Type:</strong> <span class="badge seat-${type}">${type}</span></p>
+            `;
+        }
+
+        // Apply seat type to selected seat
+        function applySeatType() {
+            if (!selectedSeat) return;
+            
+            const newType = document.getElementById('seatType').value;
+            
+            // Update the visual appearance
+            selectedSeat.classList.forEach(cls => {
+                if (cls.startsWith('seat-') && cls !== 'seat-selected') {
+                    selectedSeat.classList.remove(cls);
+                }
+            });
+            
+            selectedSeat.classList.add(`seat-${newType}`);
+            selectedSeat.dataset.type = newType;
+            
+            // Update selected seat info
+            updateSelectedSeatInfo();
+        }
+
+        // Apply seat type to entire row
+        function applyTypeToRow() {
+            if (!selectedSeat) return;
+            
+            const row = selectedSeat.dataset.row;
+            const newType = document.getElementById('seatType').value;
+            
+            // Update all seats in this row
+            document.querySelectorAll(`.seat[data-row="${row}"]`).forEach(seat => {
+                seat.classList.forEach(cls => {
+                    if (cls.startsWith('seat-') && cls !== 'seat-selected') {
+                        seat.classList.remove(cls);
+                    }
+                });
+                
+                seat.classList.add(`seat-${newType}`);
+                seat.dataset.type = newType;
+            });
+        }
+
+        // Save seats configuration
+        async function saveSeatsConfiguration() {
+            try {
+                if (!currentScreenId) {
+                    throw new Error('No screen selected');
+                }
+                
+                const rows = parseInt(document.getElementById('seatsRows').value);
+                const seatsPerRow = parseInt(document.getElementById('seatsPerRow').value);
+                
+                // Gather all seat data from preview
+                const seatsData = [];
+                
+                // For each row
+                for (let i = 0; i < rows; i++) {
+                    const rowLetter = String.fromCharCode(65 + i);
+                    
+                    // For each seat in row
+                    for (let j = 1; j <= seatsPerRow; j++) {
+                        const seatElement = document.querySelector(`.seat[data-row="${rowLetter}"][data-number="${j}"]`);
+                        
+                        if (seatElement) {
+                            const seatType = seatElement.dataset.type || 'standard';
+                            const seatId = seatElement.dataset.seatId || null;
+                            
+                            // If seat exists in database already
+                            if (seatId) {
+                                // Update existing seat
+                                const seatData = {
+                                    id: parseInt(seatId),
+                                    screen_id: parseInt(currentScreenId),
+                                    row: rowLetter,
+                                    number: j,
+                                    seat_type: seatType
+                                };
+                                
+                                const response = await fetch(`http://localhost:3003/seats/${seatId}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(seatData)
+                                });
+                                
+                                if (!response.ok) {
+                                    throw new Error(`Failed to update seat ${rowLetter}${j}`);
+                                }
+                            } else {
+                                // Create new seat
+                                const seatData = {
+                                    screen_id: parseInt(currentScreenId),
+                                    row: rowLetter,
+                                    number: j,
+                                    seat_type: seatType
+                                };
+                                
+                                const response = await fetch('http://localhost:3003/seats/', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(seatData)
+                                });
+                                
+                                if (!response.ok) {
+                                    throw new Error(`Failed to create seat ${rowLetter}${j}`);
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('manageSeatsModal'));
+                modal.hide();
+                
+                // Show success message
+                showToast('Seats configuration saved successfully!', 'success');
+                
+                // Reload screen details if we're looking at a specific screen
+                if (currentScreenId) {
+                    viewScreenDetails(currentScreenId);
+                }
+            } catch (error) {
+                console.error('Error saving seats configuration:', error);
+                showToast(`Failed to save seats: ${error.message}`, 'error');
+            }
+        }
+
+        // Edit individual seat
+        function editSeat(seatId) {
+            try {
+                // Find the seat in our data
+                const seat = screenSeats.find(s => s.id === parseInt(seatId));
+                
+                if (!seat) {
+                    throw new Error('Seat not found');
+                }
+                
+                // Populate form
+                document.getElementById('editSeatId').value = seat.id;
+                document.getElementById('editSeatRow').value = seat.row;
+                document.getElementById('editSeatNumber').value = seat.number;
+                document.getElementById('editSeatType').value = seat.seat_type || 'standard';
+                document.getElementById('editSeatPrice').value = seat.price_modifier || 100;
+                
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('editSeatModal'));
+                modal.show();
+            } catch (error) {
+                console.error('Error editing seat:', error);
+                showToast(`Failed to edit seat: ${error.message}`, 'error');
+            }
+        }
+
+        // Update seat
+        async function updateSeat() {
+            try {
+                const seatId = document.getElementById('editSeatId').value;
+                const seatType = document.getElementById('editSeatType').value;
+                const priceModifier = document.getElementById('editSeatPrice').value;
+                
+                const seatData = {
+                    seat_type: seatType,
+                    price_modifier: parseInt(priceModifier)
+                };
+                
+                const response = await fetch(`http://localhost:3003/seats/${seatId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(seatData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to update seat');
+                }
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editSeatModal'));
+                modal.hide();
+                
+                // If we're in seat management view, refresh it
+                if (document.getElementById('manageSeatsModal').classList.contains('show')) {
+                    // Reload seats for current screen
+                    const seatsResponse = await fetch(`http://localhost:3003/screens/${currentScreenId}/seats`);
+                    if (seatsResponse.ok) {
+                        screenSeats = await seatsResponse.json();
+                        generateSeatsPreview();
+                    }
+                }
+                
+                // Show success message
+                showToast('Seat updated successfully!', 'success');
+            } catch (error) {
+                console.error('Error updating seat:', error);
+                showToast(`Failed to update seat: ${error.message}`, 'error');
+            }
+        }
+
+        // Helper function to show toast messages (you need to add the toast container to your HTML)
+        function showToast(message, type = 'info') {
+            // You can implement this with bootstrap toasts
+            // For now, we'll use alert as a simple fallback
+            if (type === 'error') {
+                alert('Error: ' + message);
+            } else if (type === 'warning') {
+                alert('Warning: ' + message);
+            } else {
+                alert(message);
+            }
+        }
+
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date in header
+            const now = new Date();
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Load theaters when create modal is shown
+            document.getElementById('createScreenModal').addEventListener('show.bs.modal', loadTheaters);
+
+            // Set up event listeners for manage seats modal
+            document.getElementById('regenerateSeatsBtn').addEventListener('click', generateSeatsPreview);
+            document.getElementById('saveSeatsBtn').addEventListener('click', saveSeatsConfiguration);
+            document.getElementById('applySeatType').addEventListener('click', applySeatType);
+            document.getElementById('applyToRow').addEventListener('click', applyTypeToRow);
+            
+            // Prevent exceeding maximums in inputs
+            document.getElementById('seatsRows').addEventListener('change', function() {
+                if (this.value > 26) this.value = 26;
+                if (this.value < 1) this.value = 1;
+            });
+            
+            document.getElementById('seatsPerRow').addEventListener('change', function() {
+                if (this.value > 20) this.value = 20;
+                if (this.value < 1) this.value = 1;
+            });
+
+            // Load screens
+            loadScreens();
+        });
+    </script>
+</body>
+</html>
