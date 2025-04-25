@@ -1,13 +1,17 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000; // Ubah ke 3004 agar sesuai dengan service lain
 
 app.use(express.json());
 
+app.use(cors());
+
 // Import routes
 const scheduleRoutes = require('./routes/schedules');
 
+app.use(cors());
 // Use routes
 app.use('/schedules', scheduleRoutes);
 
