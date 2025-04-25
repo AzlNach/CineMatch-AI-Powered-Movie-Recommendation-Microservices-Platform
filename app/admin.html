@@ -1,0 +1,1368 @@
+<!-- ADMIN PAGES - Create a separate file called admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch Admin Panel</title>
+    <style>
+        /* Base styles */
+        :root {
+            --primary-color: #e50914;
+            --secondary-color: #221f1f;
+            --background-color: #141414;
+            --text-color: #ffffff;
+            --card-color: #333333;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 16px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        /* Admin panel styles */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        /* Table styles */
+        .admin-table-container {
+            overflow-x: auto;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: var(--text-color);
+        }
+
+        .admin-table th, 
+        .admin-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+
+        .admin-table th {
+            background-color: #222;
+            font-weight: bold;
+        }
+
+        .admin-table tr:hover {
+            background-color: #383838;
+        }
+
+        /* Button styles */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #f40612;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .btn-secondary {
+            background-color: #555;
+        }
+
+        .btn-secondary:hover {
+            background-color: #666;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background-color: #454545;
+            color: var(--text-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: 2px solid var(--primary-color);
+        }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--card-color);
+            border-radius: 5px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-lg {
+            max-width: 800px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-modal:hover {
+            color: var(--text-color);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Theater preview */
+        .theater-preview {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #222;
+            border-radius: 5px;
+        }
+
+        .theater-preview h3 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        small {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background-color: var(--success-color);
+            color: #fff;
+        }
+
+        .status-coming-soon {
+            background-color: var(--warning-color);
+            color: #fff;
+        }
+        
+        /* Screen and seating styles for theater preview */
+        .screen {
+            height: 10px;
+            background-color: #aaa;
+            margin: 0 auto 30px;
+            width: 80%;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+        }
+
+        .screen-label {
+            margin-bottom: 10px;
+            color: #aaa;
+            text-align: center;
+        }
+
+        .seat-layout {
+            display: inline-block;
+            margin: 0 auto;
+            text-align: center;
+            width: 100%;
+        }
+
+        .seat-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .row-label {
+            width: 30px;
+            text-align: right;
+            padding-right: 10px;
+            line-height: 30px;
+        }
+
+        .seat {
+            width: 25px;
+            height: 25px;
+            margin: 0 3px;
+            background-color: #444;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <!-- ADMIN DASHBOARD -->
+    <div id="admin-dashboard">
+        <div class="container">
+            <header>
+                <div class="logo">CineMatch Admin</div>
+                <div class="nav-links">
+                    <a class="nav-link active" id="movies-tab">Movies</a>
+                    <a class="nav-link" id="theaters-tab">Theaters</a>
+                    <a class="nav-link" id="schedules-tab">Schedules</a>
+                    <a class="nav-link" href="user.html">Go to User View</a>
+                </div>
+            </header>
+
+            <!-- Movies Management Section -->
+            <div id="movies-section">
+                <div class="admin-header">
+                    <h2 class="section-title">Movies Management</h2>
+                    <button id="add-movie-btn" class="btn">Add New Movie</button>
+                </div>
+
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Poster</th>
+                                <th>Title</th>
+                                <th>Genre</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movies-table-body">
+                            <!-- Movie data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Theaters Management Section -->
+            <div id="theaters-section" class="hidden">
+                <div class="admin-header">
+                    <h2 class="section-title">Theaters Management</h2>
+                    <button id="add-theater-btn" class="btn">Add New Theater</button>
+                </div>
+
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Location</th>
+                                <th>Capacity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="theaters-table-body">
+                            <!-- Theater data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Schedules Management Section -->
+            <div id="schedules-section" class="hidden">
+                <div class="admin-header">
+                    <h2 class="section-title">Schedules Management</h2>
+                    <button id="add-schedule-btn" class="btn">Add New Schedule</button>
+                </div>
+
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Movie</th>
+                                <th>Theater</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedules-table-body">
+                            <!-- Schedule data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD/EDIT MOVIE MODAL -->
+    <div id="movie-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="movie-modal-title">Add New Movie</h2>
+            <form id="movie-form">
+                <input type="hidden" id="movie-id">
+                <div class="form-group">
+                    <label class="form-label" for="movie-title">Title</label>
+                    <input type="text" id="movie-title" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="movie-description">Description</label>
+                    <textarea id="movie-description" class="form-input" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="movie-duration">Duration (minutes)</label>
+                    <input type="number" id="movie-duration" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="movie-release-date">Release Date</label>
+                    <input type="date" id="movie-release-date" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="movie-genres">Genres</label>
+                    <select id="movie-genres" class="form-input" multiple required>
+                        <option value="Action">Action</option>
+                        <option value="Adventure">Adventure</option>
+                        <option value="Comedy">Comedy</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Sci-Fi">Sci-Fi</option>
+                        <option value="Thriller">Thriller</option>
+                        <option value="Fantasy">Fantasy</option>
+                    </select>
+                    <small>Hold Ctrl/Cmd to select multiple genres</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="movie-rating">Rating</label>
+                    <select id="movie-rating" class="form-input" required>
+                        <option value="G">G</option>
+                        <option value="PG">PG</option>
+                        <option value="PG-13">PG-13</option>
+                        <option value="R">R</option>
+                        <option value="NC-17">NC-17</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="movie-poster-url">Poster URL</label>
+                    <input type="url" id="movie-poster-url" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="movie-status">Status</label>
+                    <select id="movie-status" class="form-input" required>
+                        <option value="now-showing">Now Showing</option>
+                        <option value="coming-soon">Coming Soon</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn" id="save-movie-btn">Save Movie</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD/EDIT THEATER MODAL -->
+    <div id="theater-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="theater-modal-title">Add New Theater</h2>
+            <form id="theater-form">
+                <input type="hidden" id="theater-id">
+                <div class="form-group">
+                    <label class="form-label" for="theater-name">Name</label>
+                    <input type="text" id="theater-name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="theater-location">Location</label>
+                    <input type="text" id="theater-location" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="theater-capacity">Capacity</label>
+                    <input type="number" id="theater-capacity" class="form-input" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn" id="save-theater-btn">Save Theater</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MANAGE THEATER SEATS MODAL -->
+    <div id="seats-modal" class="modal hidden">
+        <div class="modal-content modal-lg">
+            <span class="close-modal">&times;</span>
+            <h2 id="seats-modal-title">Manage Theater Seats</h2>
+            <form id="seats-form">
+                <input type="hidden" id="seats-theater-id">
+                <div class="form-group">
+                    <label class="form-label" for="seat-rows">Number of Rows</label>
+                    <input type="number" id="seat-rows" class="form-input" min="1" max="26" value="8" required>
+                    <small>Maximum 26 rows (A-Z)</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="seats-per-row">Seats per Row</label>
+                    <input type="number" id="seats-per-row" class="form-input" min="1" max="20" value="10" required>
+                </div>
+                <div class="theater-preview">
+                    <h3>Theater Layout Preview</h3>
+                    <div class="screen-label">SCREEN</div>
+                    <div class="screen"></div>
+                    <div id="seats-preview" class="seat-layout">
+                        <!-- Seat layout will be generated here -->
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                    <button type="button" class="btn btn-secondary" id="update-preview-btn">Update Preview</button>
+                    <button type="submit" class="btn" id="save-seats-btn">Save Layout</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD/EDIT SCHEDULE MODAL -->
+    <div id="schedule-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="schedule-modal-title">Add New Schedule</h2>
+            <form id="schedule-form">
+                <input type="hidden" id="schedule-id">
+                <div class="form-group">
+                    <label class="form-label" for="schedule-movie">Movie</label>
+                    <select id="schedule-movie" class="form-input" required>
+                        <option value="">Select a movie</option>
+                        <!-- Movie options will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="schedule-theater">Theater</label>
+                    <select id="schedule-theater" class="form-input" required>
+                        <option value="">Select a theater</option>
+                        <!-- Theater options will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="schedule-date">Date</label>
+                    <input type="date" id="schedule-date" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="schedule-start-time">Start Time</label>
+                    <input type="time" id="schedule-start-time" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="schedule-end-time">End Time</label>
+                    <input type="time" id="schedule-end-time" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="schedule-price">Ticket Price (Rp)</label>
+                    <input type="number" id="schedule-price" class="form-input" min="0" step="1000" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn" id="save-schedule-btn">Save Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="delete-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Confirm Deletion</h2>
+            <p id="delete-message">Are you sure you want to delete this item?</p>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample data for the admin dashboard
+            let movies = [
+                {
+                    id: 1,
+                    title: "The Matrix Resurrections",
+                    description: "Return to the world of The Matrix",
+                    duration: 148,
+                    releaseDate: "2023-07-01",
+                    genres: ["Action", "Sci-Fi"],
+                    rating: "PG-13",
+                    posterUrl: "https://example.com/matrix.jpg",
+                    status: "now-showing"
+                },
+                {
+                    id: 2,
+                    title: "Dune",
+                    description: "Feature adaptation of Frank Herbert's science fiction novel",
+                    duration: 155,
+                    releaseDate: "2023-07-15",
+                    genres: ["Adventure", "Drama", "Sci-Fi"],
+                    rating: "PG-13",
+                    posterUrl: "https://example.com/dune.jpg",
+                    status: "coming-soon"
+                }
+            ];
+
+            let theaters = [
+                { 
+                    id: 1, 
+                    name: "Studio 1", 
+                    location: "First Floor",
+                    capacity: 100
+                },
+                { 
+                    id: 2, 
+                    name: "Studio 2",
+                    location: "Second Floor",
+                    capacity: 80
+                }
+            ];
+
+            let schedules = [
+                {
+                    id: 1,
+                    movieId: 1,
+                    theaterId: 1,
+                    date: "2023-07-10",
+                    startTime: "10:00",
+                    endTime: "12:30",
+                    price: 50000
+                },
+                {
+                    id: 2,
+                    movieId: 1,
+                    theaterId: 1,
+                    date: "2023-07-10",
+                    startTime: "13:00",
+                    endTime: "15:30",
+                    price: 50000
+                },
+                {
+                    id: 3,
+                    movieId: 2,
+                    theaterId: 2,
+                    date: "2023-07-10",
+                    startTime: "10:30",
+                    endTime: "12:45",
+                    price: 45000
+                }
+            ];
+
+            // Tab navigation
+            const tabs = {
+                moviesTab: document.getElementById('movies-tab'),
+                theatersTab: document.getElementById('theaters-tab'),
+                schedulesTab: document.getElementById('schedules-tab')
+            };
+
+            const sections = {
+                moviesSection: document.getElementById('movies-section'),
+                theatersSection: document.getElementById('theaters-section'),
+                schedulesSection: document.getElementById('schedules-section')
+            };
+
+            // Show a specific section and hide others
+            function showSection(sectionName) {
+                for (const section in sections) {
+                    if (section === sectionName + 'Section') {
+                        sections[section].classList.remove('hidden');
+                    } else {
+                        sections[section].classList.add('hidden');
+                    }
+                }
+
+                // Update active tab
+                for (const tab in tabs) {
+                    if (tab === sectionName + 'Tab') {
+                        tabs[tab].classList.add('active');
+                    } else {
+                        tabs[tab].classList.remove('active');
+                    }
+                }
+            }
+
+            // Tab click handlers
+            tabs.moviesTab.addEventListener('click', () => showSection('movies'));
+            tabs.theatersTab.addEventListener('click', () => showSection('theaters'));
+            tabs.schedulesTab.addEventListener('click', () => showSection('schedules'));
+
+            // Modal handling
+            const modals = {
+                movieModal: document.getElementById('movie-modal'),
+                theaterModal: document.getElementById('theater-modal'),
+                seatsModal: document.getElementById('seats-modal'),
+                scheduleModal: document.getElementById('schedule-modal'),
+                deleteModal: document.getElementById('delete-modal')
+            };
+
+            // Open a modal
+            function openModal(modalName) {
+                modals[modalName].classList.remove('hidden');
+            }
+
+            // Close a modal
+            function closeModal(modalName) {
+                modals[modalName].classList.add('hidden');
+            }
+
+            // Close modal buttons
+            document.querySelectorAll('.close-modal, .close-modal-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Find parent modal and close it
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Load data in tables
+            function loadMoviesTable() {
+                const tableBody = document.getElementById('movies-table-body');
+                tableBody.innerHTML = '';
+
+                movies.forEach(movie => {
+                    const row = document.createElement('tr');
+                    
+                    // Format the status for display
+                    const statusClass = movie.status === 'now-showing' ? 'status-active' : 'status-coming-soon';
+                    const statusText = movie.status === 'now-showing' ? 'Now Showing' : 'Coming Soon';
+                    
+                    row.innerHTML = `
+                        <td>${movie.id}</td>
+                        <td><img src="${movie.posterUrl}" alt="${movie.title}" style="width: 50px; height: 75px; object-fit: cover;"></td>
+                        <td>${movie.title}</td>
+                        <td>${movie.genres.join(', ')}</td>
+                        <td>${movie.duration} min</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="btn-small edit-movie-btn" data-id="${movie.id}">Edit</button>
+                            <button class="btn-small btn-danger delete-movie-btn" data-id="${movie.id}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Add event listeners to edit and delete buttons
+                document.querySelectorAll('.edit-movie-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const movieId = parseInt(this.getAttribute('data-id'));
+                        editMovie(movieId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-movie-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const movieId = parseInt(this.getAttribute('data-id'));
+                        confirmDeleteMovie(movieId);
+                    });
+                });
+            }
+
+            function loadTheatersTable() {
+                const tableBody = document.getElementById('theaters-table-body');
+                tableBody.innerHTML = '';
+
+                theaters.forEach(theater => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${theater.id}</td>
+                        <td>${theater.name}</td>
+                        <td>${theater.location}</td>
+                        <td>${theater.capacity}</td>
+                        <td>
+                            <button class="btn-small edit-theater-btn" data-id="${theater.id}">Edit</button>
+                            <button class="btn-small btn-danger delete-theater-btn" data-id="${theater.id}">Delete</button>
+                            <button class="btn-small manage-seats-btn" data-id="${theater.id}">Manage Seats</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Add event listeners to buttons
+                document.querySelectorAll('.edit-theater-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const theaterId = parseInt(this.getAttribute('data-id'));
+                        editTheater(theaterId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-theater-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const theaterId = parseInt(this.getAttribute('data-id'));
+                        confirmDeleteTheater(theaterId);
+                    });
+                });
+
+                document.querySelectorAll('.manage-seats-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const theaterId = parseInt(this.getAttribute('data-id'));
+                        manageTheaterSeats(theaterId);
+                    });
+                });
+            }
+
+            function loadSchedulesTable() {
+                const tableBody = document.getElementById('schedules-table-body');
+                tableBody.innerHTML = '';
+
+                schedules.forEach(schedule => {
+                    const movie = movies.find(m => m.id === schedule.movieId) || { title: 'Unknown' };
+                    const theater = theaters.find(t => t.id === schedule.theaterId) || { name: 'Unknown' };
+                    
+                    const row = document.createElement('tr');
+                    
+                    // Format price for display
+                    const formattedPrice = new Intl.NumberFormat('id-ID', { 
+                        style: 'currency', 
+                        currency: 'IDR',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(schedule.price);
+                    
+                    row.innerHTML = `
+                        <td>${schedule.id}</td>
+                        <td>${movie.title}</td>
+                        <td>${theater.name}</td>
+                        <td>${formatDate(schedule.date)}</td>
+                        <td>${schedule.startTime} - ${schedule.endTime}</td>
+                        <td>${formattedPrice}</td>
+                        <td>
+                            <button class="btn-small edit-schedule-btn" data-id="${schedule.id}">Edit</button>
+                            <button class="btn-small btn-danger delete-schedule-btn" data-id="${schedule.id}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Add event listeners to buttons
+                document.querySelectorAll('.edit-schedule-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const scheduleId = parseInt(this.getAttribute('data-id'));
+                        editSchedule(scheduleId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-schedule-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const scheduleId = parseInt(this.getAttribute('data-id'));
+                        confirmDeleteSchedule(scheduleId);
+                    });
+                });
+            }
+
+            // Helper function to format dates
+            function formatDate(dateString) {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('en-US', options);
+            }
+
+            // Movie management
+            function addMovie() {
+                // Reset form
+                document.getElementById('movie-form').reset();
+                document.getElementById('movie-id').value = '';
+                document.getElementById('movie-modal-title').textContent = 'Add New Movie';
+                
+                // Open modal
+                openModal('movieModal');
+            }
+
+            function editMovie(movieId) {
+                const movie = movies.find(m => m.id === movieId);
+                if (!movie) return;
+
+                // Fill form with movie data
+                document.getElementById('movie-id').value = movie.id;
+                document.getElementById('movie-title').value = movie.title;
+                document.getElementById('movie-description').value = movie.description;
+                document.getElementById('movie-duration').value = movie.duration;
+                document.getElementById('movie-release-date').value = movie.releaseDate;
+                document.getElementById('movie-poster-url').value = movie.posterUrl;
+                document.getElementById('movie-status').value = movie.status;
+                document.getElementById('movie-rating').value = movie.rating;
+                
+                // Set genres (multiple select)
+                const genresSelect = document.getElementById('movie-genres');
+                for (let i = 0; i < genresSelect.options.length; i++) {
+                    genresSelect.options[i].selected = movie.genres.includes(genresSelect.options[i].value);
+                }
+                
+                document.getElementById('movie-modal-title').textContent = 'Edit Movie';
+                
+                // Open modal
+                openModal('movieModal');
+            }
+
+            function saveMovie(event) {
+                event.preventDefault();
+                
+                // Get form data
+                const movieId = document.getElementById('movie-id').value;
+                const movie = {
+                    title: document.getElementById('movie-title').value,
+                    description: document.getElementById('movie-description').value,
+                    duration: parseInt(document.getElementById('movie-duration').value),
+                    releaseDate: document.getElementById('movie-release-date').value,
+                    posterUrl: document.getElementById('movie-poster-url').value,
+                    status: document.getElementById('movie-status').value,
+                    rating: document.getElementById('movie-rating').value,
+                    genres: Array.from(document.getElementById('movie-genres').selectedOptions).map(option => option.value)
+                };
+                
+                if (movieId) {
+                    // Update existing movie
+                    const index = movies.findIndex(m => m.id == movieId);
+                    if (index !== -1) {
+                        movies[index] = { ...movies[index], ...movie };
+                        alert('Movie updated successfully!');
+                    }
+                } else {
+                    // Add new movie
+                    const newId = movies.length > 0 ? Math.max(...movies.map(m => m.id)) + 1 : 1;
+                    movies.push({ id: newId, ...movie });
+                    alert('Movie added successfully!');
+                }
+                
+                // Close modal and refresh table
+                closeModal('movieModal');
+                loadMoviesTable();
+                
+                // Refresh schedule dropdown if open
+                populateMoviesDropdown();
+            }
+
+            function confirmDeleteMovie(movieId) {
+                const movie = movies.find(m => m.id === movieId);
+                if (!movie) return;
+                
+                document.getElementById('delete-message').textContent = `Are you sure you want to delete the movie "${movie.title}"?`;
+                
+                // Set up delete confirmation
+                const confirmButton = document.getElementById('confirm-delete-btn');
+                confirmButton.onclick = function() {
+                    deleteMovie(movieId);
+                    closeModal('deleteModal');
+                };
+                
+                openModal('deleteModal');
+            }
+
+            function deleteMovie(movieId) {
+                // Check if this movie is used in any schedules
+                const movieInUse = schedules.some(s => s.movieId === movieId);
+                
+                if (movieInUse) {
+                    alert('Cannot delete this movie as it is used in one or more schedules.');
+                    return;
+                }
+                
+                // Remove movie
+                movies = movies.filter(m => m.id !== movieId);
+                alert('Movie deleted successfully!');
+                loadMoviesTable();
+                
+                // Refresh schedules table and dropdown
+                loadSchedulesTable();
+                populateMoviesDropdown();
+            }
+
+            // Theater management
+            function addTheater() {
+                // Reset form
+                document.getElementById('theater-form').reset();
+                document.getElementById('theater-id').value = '';
+                document.getElementById('theater-modal-title').textContent = 'Add New Theater';
+                
+                // Open modal
+                openModal('theaterModal');
+            }
+
+            function editTheater(theaterId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater) return;
+
+                // Fill form with theater data
+                document.getElementById('theater-id').value = theater.id;
+                document.getElementById('theater-name').value = theater.name;
+                document.getElementById('theater-location').value = theater.location;
+                document.getElementById('theater-capacity').value = theater.capacity;
+                
+                document.getElementById('theater-modal-title').textContent = 'Edit Theater';
+                
+                // Open modal
+                openModal('theaterModal');
+            }
+
+            function saveTheater(event) {
+                event.preventDefault();
+                
+                // Get form data
+                const theaterId = document.getElementById('theater-id').value;
+                const theater = {
+                    name: document.getElementById('theater-name').value,
+                    location: document.getElementById('theater-location').value,
+                    capacity: parseInt(document.getElementById('theater-capacity').value)
+                };
+                
+                if (theaterId) {
+                    // Update existing theater
+                    const index = theaters.findIndex(t => t.id == theaterId);
+                    if (index !== -1) {
+                        theaters[index] = { ...theaters[index], ...theater };
+                        alert('Theater updated successfully!');
+                    }
+                } else {
+                    // Add new theater
+                    const newId = theaters.length > 0 ? Math.max(...theaters.map(t => t.id)) + 1 : 1;
+                    theaters.push({ id: newId, ...theater });
+                    alert('Theater added successfully!');
+                }
+                
+                // Close modal and refresh table
+                closeModal('theaterModal');
+                loadTheatersTable();
+                
+                // Refresh schedule dropdown if open
+                populateTheatersDropdown();
+            }
+
+            function confirmDeleteTheater(theaterId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater) return;
+                
+                document.getElementById('delete-message').textContent = `Are you sure you want to delete the theater "${theater.name}"?`;
+                
+                // Set up delete confirmation
+                const confirmButton = document.getElementById('confirm-delete-btn');
+                confirmButton.onclick = function() {
+                    deleteTheater(theaterId);
+                    closeModal('deleteModal');
+                };
+                
+                openModal('deleteModal');
+            }
+
+            function deleteTheater(theaterId) {
+                // Check if this theater is used in any schedules
+                const theaterInUse = schedules.some(s => s.theaterId === theaterId);
+                
+                if (theaterInUse) {
+                    alert('Cannot delete this theater as it is used in one or more schedules.');
+                    return;
+                }
+                
+                // Remove theater
+                theaters = theaters.filter(t => t.id !== theaterId);
+                alert('Theater deleted successfully!');
+                loadTheatersTable();
+                
+                // Refresh schedules table and dropdown
+                loadSchedulesTable();
+                populateTheatersDropdown();
+            }
+
+            function manageTheaterSeats(theaterId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater) return;
+                
+                document.getElementById('seats-theater-id').value = theater.id;
+                document.getElementById('seats-modal-title').textContent = `Manage Seats for ${theater.name}`;
+                
+                // Set default values based on theater capacity
+                const estimatedRows = Math.ceil(Math.sqrt(theater.capacity));
+                const estimatedSeatsPerRow = Math.ceil(theater.capacity / estimatedRows);
+                
+                document.getElementById('seat-rows').value = estimatedRows > 26 ? 26 : estimatedRows;
+                document.getElementById('seats-per-row').value = estimatedSeatsPerRow > 20 ? 20 : estimatedSeatsPerRow;
+                
+                // Generate initial preview
+                generateSeatPreview();
+                
+                openModal('seatsModal');
+            }
+
+            function generateSeatPreview() {
+                const rows = parseInt(document.getElementById('seat-rows').value) || 8;
+                const seatsPerRow = parseInt(document.getElementById('seats-per-row').value) || 10;
+                const previewContainer = document.getElementById('seats-preview');
+                
+                previewContainer.innerHTML = '';
+                
+                for (let row = 0; row < rows; row++) {
+                    const seatRow = document.createElement('div');
+                    seatRow.className = 'seat-row';
+                    
+                    // Add row label
+                    const rowLabel = document.createElement('div');
+                    rowLabel.className = 'row-label';
+                    rowLabel.textContent = String.fromCharCode(65 + row); // A, B, C, ...
+                    seatRow.appendChild(rowLabel);
+                    
+                    // Add seats
+                    for (let seat = 0; seat < seatsPerRow; seat++) {
+                        const seatElement = document.createElement('div');
+                        seatElement.className = 'seat';
+                        seatRow.appendChild(seatElement);
+                    }
+                    
+                    previewContainer.appendChild(seatRow);
+                }
+            }
+
+            function saveTheaterSeats(event) {
+                event.preventDefault();
+                
+                const theaterId = parseInt(document.getElementById('seats-theater-id').value);
+                const rows = parseInt(document.getElementById('seat-rows').value);
+                const seatsPerRow = parseInt(document.getElementById('seats-per-row').value);
+                
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater) return;
+                
+                // Update theater capacity
+                theater.capacity = rows * seatsPerRow;
+                
+                alert(`Seat layout for ${theater.name} updated successfully!`);
+                closeModal('seatsModal');
+                loadTheatersTable();
+            }
+
+            // Schedule management
+            function populateMoviesDropdown() {
+                const movieSelect = document.getElementById('schedule-movie');
+                const currentValue = movieSelect.value; // Store current selection
+                
+                // Clear existing options except the first placeholder
+                while (movieSelect.options.length > 1) {
+                    movieSelect.remove(1);
+                }
+                
+                // Add movie options
+                movies.forEach(movie => {
+                    const option = document.createElement('option');
+                    option.value = movie.id;
+                    option.textContent = movie.title;
+                    movieSelect.appendChild(option);
+                });
+                
+                // Restore selection if possible
+                if (currentValue) {
+                    movieSelect.value = currentValue;
+                }
+            }
+
+            function populateTheatersDropdown() {
+                const theaterSelect = document.getElementById('schedule-theater');
+                const currentValue = theaterSelect.value; // Store current selection
+                
+                // Clear existing options except the first placeholder
+                while (theaterSelect.options.length > 1) {
+                    theaterSelect.remove(1);
+                }
+                
+                // Add theater options
+                theaters.forEach(theater => {
+                    const option = document.createElement('option');
+                    option.value = theater.id;
+                    option.textContent = theater.name;
+                    theaterSelect.appendChild(option);
+                });
+                
+                // Restore selection if possible
+                if (currentValue) {
+                    theaterSelect.value = currentValue;
+                }
+            }
+
+            function addSchedule() {
+                // Reset form
+                document.getElementById('schedule-form').reset();
+                document.getElementById('schedule-id').value = '';
+                document.getElementById('schedule-modal-title').textContent = 'Add New Schedule';
+                
+                // Populate dropdowns
+                populateMoviesDropdown();
+                populateTheatersDropdown();
+                
+                // Set default date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('schedule-date').value = today;
+                
+                // Open modal
+                openModal('scheduleModal');
+            }
+
+            function editSchedule(scheduleId) {
+                const schedule = schedules.find(s => s.id === scheduleId);
+                if (!schedule) return;
+
+                // Fill form with schedule data
+                document.getElementById('schedule-id').value = schedule.id;
+                document.getElementById('schedule-movie').value = schedule.movieId;
+                document.getElementById('schedule-theater').value = schedule.theaterId;
+                document.getElementById('schedule-date').value = schedule.date;
+                document.getElementById('schedule-start-time').value = schedule.startTime;
+                document.getElementById('schedule-end-time').value = schedule.endTime;
+                document.getElementById('schedule-price').value = schedule.price;
+                
+                // Populate dropdowns
+                populateMoviesDropdown();
+                populateTheatersDropdown();
+                
+                document.getElementById('schedule-modal-title').textContent = 'Edit Schedule';
+                
+                // Open modal
+                openModal('scheduleModal');
+            }
+
+            function saveSchedule(event) {
+                event.preventDefault();
+                
+                // Get form data
+                const scheduleId = document.getElementById('schedule-id').value;
+                const schedule = {
+                    movieId: parseInt(document.getElementById('schedule-movie').value),
+                    theaterId: parseInt(document.getElementById('schedule-theater').value),
+                    date: document.getElementById('schedule-date').value,
+                    startTime: document.getElementById('schedule-start-time').value,
+                    endTime: document.getElementById('schedule-end-time').value,
+                    price: parseInt(document.getElementById('schedule-price').value)
+                };
+                
+                // Basic validation
+                if (!schedule.movieId || !schedule.theaterId || !schedule.date || !schedule.startTime || !schedule.endTime) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                if (schedule.startTime >= schedule.endTime) {
+                    alert('End time must be after start time.');
+                    return;
+                }
+                
+                if (scheduleId) {
+                    // Update existing schedule
+                    const index = schedules.findIndex(s => s.id == scheduleId);
+                    if (index !== -1) {
+                        schedules[index] = { ...schedules[index], ...schedule };
+                        alert('Schedule updated successfully!');
+                    }
+                } else {
+                    // Check for schedule conflicts
+                    const sameTheaterSchedules = schedules.filter(s => 
+                        s.theaterId === schedule.theaterId && 
+                        s.date === schedule.date
+                    );
+                    
+                    const conflict = sameTheaterSchedules.some(s => {
+                        return (schedule.startTime >= s.startTime && schedule.startTime < s.endTime) ||
+                               (schedule.endTime > s.startTime && schedule.endTime <= s.endTime) ||
+                               (schedule.startTime <= s.startTime && schedule.endTime >= s.endTime);
+                    });
+                    
+                    if (conflict) {
+                        alert('There is a scheduling conflict with an existing schedule in this theater.');
+                        return;
+                    }
+                    
+                    // Add new schedule
+                    const newId = schedules.length > 0 ? Math.max(...schedules.map(s => s.id)) + 1 : 1;
+                    schedules.push({ id: newId, ...schedule });
+                    alert('Schedule added successfully!');
+                }
+                
+                // Close modal and refresh table
+                closeModal('scheduleModal');
+                loadSchedulesTable();
+            }
+
+            function confirmDeleteSchedule(scheduleId) {
+                const schedule = schedules.find(s => s.id === scheduleId);
+                if (!schedule) return;
+                
+                const movie = movies.find(m => m.id === schedule.movieId) || { title: 'Unknown' };
+                const theater = theaters.find(t => t.id === schedule.theaterId) || { name: 'Unknown' };
+                
+                document.getElementById('delete-message').textContent = 
+                    `Are you sure you want to delete the schedule for "${movie.title}" at ${theater.name} on ${formatDate(schedule.date)} ${schedule.startTime}?`;
+                
+                // Set up delete confirmation
+                const confirmButton = document.getElementById('confirm-delete-btn');
+                confirmButton.onclick = function() {
+                    deleteSchedule(scheduleId);
+                    closeModal('deleteModal');
+                };
+                
+                openModal('deleteModal');
+            }
+
+            function deleteSchedule(scheduleId) {
+                // Remove schedule
+                schedules = schedules.filter(s => s.id !== scheduleId);
+                alert('Schedule deleted successfully!');
+                loadSchedulesTable();
+            }
+
+            // Add button event listeners
+            document.getElementById('add-movie-btn').addEventListener('click', addMovie);
+            document.getElementById('add-theater-btn').addEventListener('click', addTheater);
+            document.getElementById('add-schedule-btn').addEventListener('click', addSchedule);
+            
+            // Form submission handlers
+            document.getElementById('movie-form').addEventListener('submit', saveMovie);
+            document.getElementById('theater-form').addEventListener('submit', saveTheater);
+            document.getElementById('seats-form').addEventListener('submit', saveTheaterSeats);
+            document.getElementById('schedule-form').addEventListener('submit', saveSchedule);
+            
+            // Seat preview button
+            document.getElementById('update-preview-btn').addEventListener('click', generateSeatPreview);
+            
+            // Initialize tables
+            loadMoviesTable();
+            loadTheatersTable();
+            loadSchedulesTable();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch Theaters Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #e50914;
+            --secondary-color: #221f1f;
+            --background-color: #141414;
+            --text-color: #ffffff;
+            --card-color: #333333;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #f40612;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-secondary {
+            background-color: #555;
+        }
+
+        .btn-secondary:hover {
+            background-color: #666;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #444;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .table-container {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+
+        th {
+            background-color: #222;
+            font-weight: bold;
+        }
+
+        tbody tr:hover {
+            background-color: #3a3a3a;
+        }
+
+        .screens-table {
+            margin-top: 20px;
+        }
+
+        .screens-table th,
+        .screens-table td {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-large {
+            max-width: 800px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close-modal:hover {
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            background-color: #454545;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .help-text {
+            color: #999;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination-item {
+            padding: 8px 12px;
+            margin: 0 5px;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .pagination-item:hover {
+            background-color: #444;
+        }
+
+        .pagination-item.active {
+            background-color: var(--primary-color);
+        }
+
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            background-color: #454545;
+            border: 1px solid #555;
+            border-radius: 4px 0 0 4px;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-btn {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        /* Theater seating preview */
+        .theater-preview {
+            margin: 20px 0;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .screen {
+            height: 10px;
+            background-color: #aaa;
+            margin: 0 auto 30px;
+            width: 80%;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+        }
+
+        .screen-label {
+            margin-bottom: 10px;
+            color: #aaa;
+        }
+
+        .seats-container {
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        .seat-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .row-label {
+            width: 30px;
+            text-align: right;
+            padding-right: 10px;
+            line-height: 25px;
+        }
+
+        .seat {
+            width: 25px;
+            height: 25px;
+            margin: 0 3px;
+            background-color: #444;
+            border-radius: 4px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1 class="page-title">Theaters Management</h1>
+        <button class="btn" id="add-theater-btn">
+            <i class="fas fa-plus"></i> Add New Theater
+        </button>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" class="search-input" placeholder="Search theaters by name or location...">
+        <button class="search-btn"><i class="fas fa-search"></i></button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Address</th>
+                    <th>Screens</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="theaters-table-body">
+                <!-- Theater data will be populated here via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <div class="pagination-item">1</div>
+        <div class="pagination-item active">2</div>
+        <div class="pagination-item">3</div>
+        <div class="pagination-item">Next</div>
+    </div>
+
+    <!-- Add/Edit Theater Modal -->
+    <div class="modal" id="theater-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="theater-modal-title">Add New Theater</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="theater-form">
+                <input type="hidden" id="theater-id">
+                <div class="form-group">
+                    <label class="form-label" for="name">Theater Name</label>
+                    <input type="text" class="form-control" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="location">Location</label>
+                    <input type="text" class="form-control" id="location" required>
+                    <div class="help-text">City or area where the theater is located</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="address">Address</label>
+                    <textarea class="form-control" id="address" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="total-screens">Total Screens</label>
+                    <input type="number" class="form-control" id="total-screens" min="1" value="1" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancel-theater-btn">Cancel</button>
+                    <button type="submit" class="btn" id="save-theater-btn">Save Theater</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Theater Screens Modal -->
+    <div class="modal" id="screens-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 class="modal-title" id="screens-modal-title">Manage Screens</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div id="screens-container">
+                <div class="table-container">
+                    <table class="screens-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Capacity</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="screens-table-body">
+                            <!-- Screen data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <button class="btn btn-sm" id="add-screen-btn" style="margin-top: 15px;">
+                    <i class="fas fa-plus"></i> Add Screen
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" id="close-screens-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Screen Modal -->
+    <div class="modal" id="screen-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="screen-modal-title">Add New Screen</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="screen-form">
+                <input type="hidden" id="screen-id">
+                <input type="hidden" id="screen-theater-id">
+                <div class="form-group">
+                    <label class="form-label" for="screen-name">Screen Name</label>
+                    <input type="text" class="form-control" id="screen-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="capacity">Capacity</label>
+                    <input type="number" class="form-control" id="capacity" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="screen-type">Screen Type</label>
+                    <select class="form-control" id="screen-type" required>
+                        <option value="standard">Standard</option>
+                        <option value="imax">IMAX</option>
+                        <option value="vip">VIP</option>
+                        <option value="3d">3D</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancel-screen-btn">Cancel</button>
+                    <button type="submit" class="btn" id="save-screen-btn">Save Screen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Screen Seats Modal -->
+    <div class="modal" id="seats-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 class="modal-title" id="seats-modal-title">Manage Seats</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="seats-form">
+                <input type="hidden" id="seats-screen-id">
+                <div class="form-group">
+                    <label class="form-label" for="rows">Number of Rows</label>
+                    <input type="number" class="form-control" id="rows" min="1" max="26" value="10" required>
+                    <div class="help-text">Maximum 26 rows (A-Z)</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="seats-per-row">Seats per Row</label>
+                    <input type="number" class="form-control" id="seats-per-row" min="1" max="20" value="10" required>
+                </div>
+                <div class="theater-preview">
+                    <div class="screen-label">SCREEN</div>
+                    <div class="screen"></div>
+                    <div id="seats-preview" class="seats-container">
+                        <!-- Seats preview will be generated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="update-preview-btn">Update Preview</button>
+                    <button type="button" class="btn btn-danger" id="cancel-seats-btn">Cancel</button>
+                    <button type="submit" class="btn" id="save-seats-btn">Save Seats</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="delete-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Confirm Delete</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <p id="delete-message">Are you sure you want to delete this theater? All associated screens and seats will also be deleted.</p>
+            <div class="modal-footer">
+                <button type="button" class="btn" id="cancel-delete-btn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample data
+            let theaters = [
+                {
+                    id: 1,
+                    name: "CineMatch Grand Plaza",
+                    location: "Central District",
+                    address: "123 Main Street, Central District",
+                    total_screens: 5,
+                    created_at: "2023-01-15T10:30:00",
+                    screens: [
+                        {
+                            id: 1,
+                            theater_id: 1,
+                            name: "Screen 1",
+                            capacity: 120,
+                            screen_type: "standard"
+                        },
+                        {
+                            id: 2,
+                            theater_id: 1,
+                            name: "IMAX Screen",
+                            capacity: 200,
+                            screen_type: "imax"
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: "CineMatch Premium Mall",
+                    location: "West End",
+                    address: "456 Park Avenue, West End",
+                    total_screens: 3,
+                    created_at: "2023-02-20T14:45:00",
+                    screens: [
+                        {
+                            id: 3,
+                            theater_id: 2,
+                            name: "VIP Screen",
+                            capacity: 60,
+                            screen_type: "vip"
+                        },
+                        {
+                            id: 4,
+                            theater_id: 2,
+                            name: "Screen 2",
+                            capacity: 100,
+                            screen_type: "standard"
+                        }
+                    ]
+                }
+            ];
+
+            // DOM elements
+            const theatersTableBody = document.getElementById('theaters-table-body');
+            const addTheaterBtn = document.getElementById('add-theater-btn');
+            const theaterModal = document.getElementById('theater-modal');
+            const screensModal = document.getElementById('screens-modal');
+            const screenModal = document.getElementById('screen-modal');
+            const seatsModal = document.getElementById('seats-modal');
+            const deleteModal = document.getElementById('delete-modal');
+            const closeModalButtons = document.querySelectorAll('.close-modal');
+            
+            // Form elements
+            const theaterForm = document.getElementById('theater-form');
+            const screenForm = document.getElementById('screen-form');
+            const seatsForm = document.getElementById('seats-form');
+            const cancelTheaterBtn = document.getElementById('cancel-theater-btn');
+            const cancelScreenBtn = document.getElementById('cancel-screen-btn');
+            const cancelSeatsBtn = document.getElementById('cancel-seats-btn');
+            const closeScreensBtn = document.getElementById('close-screens-btn');
+            const addScreenBtn = document.getElementById('add-screen-btn');
+            const updatePreviewBtn = document.getElementById('update-preview-btn');
+
+            // Event listeners
+            addTheaterBtn.addEventListener('click', openAddTheaterModal);
+            closeModalButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+            theaterForm.addEventListener('submit', saveTheater);
+            screenForm.addEventListener('submit', saveScreen);
+            seatsForm.addEventListener('submit', saveSeats);
+            cancelTheaterBtn.addEventListener('click', () => theaterModal.style.display = 'none');
+            cancelScreenBtn.addEventListener('click', () => screenModal.style.display = 'none');
+            cancelSeatsBtn.addEventListener('click', () => seatsModal.style.display = 'none');
+            closeScreensBtn.addEventListener('click', () => screensModal.style.display = 'none');
+            addScreenBtn.addEventListener('click', openAddScreenModal);
+            updatePreviewBtn.addEventListener('click', generateSeatsPreview);
+
+            // Load theaters on page load
+            loadTheaters();
+
+            // Functions
+            function loadTheaters() {
+                theatersTableBody.innerHTML = '';
+                
+                theaters.forEach(theater => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${theater.id}</td>
+                        <td>${theater.name}</td>
+                        <td>${theater.location}</td>
+                        <td>${theater.address}</td>
+                        <td>${theater.total_screens} (${theater.screens ? theater.screens.length : 0} configured)</td>
+                        <td>
+                            <button class="btn btn-sm edit-theater-btn" data-id="${theater.id}">Edit</button>
+                            <button class="btn btn-sm btn-secondary manage-screens-btn" data-id="${theater.id}">Manage Screens</button>
+                            <button class="btn btn-sm btn-danger delete-theater-btn" data-id="${theater.id}">Delete</button>
+                        </td>
+                    `;
+                    
+                    theatersTableBody.appendChild(row);
+                });
+
+                // Add event listeners to action buttons
+                document.querySelectorAll('.edit-theater-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const theaterId = parseInt(this.getAttribute('data-id'));
+                        openEditTheaterModal(theaterId);
+                    });
+                });
+
+                document.querySelectorAll('.manage-screens-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const theaterId = parseInt(this.getAttribute('data-id'));
+                        openManageScreensModal(theaterId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-theater-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const theaterId = parseInt(this.getAttribute('data-id'));
+                        openDeleteTheaterModal(theaterId);
+                    });
+                });
+            }
+
+            function openAddTheaterModal() {
+                // Reset form
+                theaterForm.reset();
+                document.getElementById('theater-id').value = '';
+                document.getElementById('theater-modal-title').text<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch Theaters Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #e50914;
+            --secondary-color: #221f1f;
+            --background-color: #141414;
+            --text-color: #ffffff;
+            --card-color: #333333;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #f40612;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-secondary {
+            background-color: #555;
+        }
+
+        .btn-secondary:hover {
+            background-color: #666;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #444;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .table-container {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+
+        th {
+            background-color: #222;
+            font-weight: bold;
+        }
+
+        tbody tr:hover {
+            background-color: #3a3a3a;
+        }
+
+        .screens-table {
+            margin-top: 20px;
+        }
+
+        .screens-table th,
+        .screens-table td {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-large {
+            max-width: 800px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close-modal:hover {
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            background-color: #454545;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .help-text {
+            color: #999;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination-item {
+            padding: 8px 12px;
+            margin: 0 5px;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .pagination-item:hover {
+            background-color: #444;
+        }
+
+        .pagination-item.active {
+            background-color: var(--primary-color);
+        }
+
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            background-color: #454545;
+            border: 1px solid #555;
+            border-radius: 4px 0 0 4px;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-btn {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        /* Theater seating preview */
+        .theater-preview {
+            margin: 20px 0;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .screen {
+            height: 10px;
+            background-color: #aaa;
+            margin: 0 auto 30px;
+            width: 80%;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+        }
+
+        .screen-label {
+            margin-bottom: 10px;
+            color: #aaa;
+        }
+
+        .seats-container {
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        .seat-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .row-label {
+            width: 30px;
+            text-align: right;
+            padding-right: 10px;
+            line-height: 25px;
+        }
+
+        .seat {
+            width: 25px;
+            height: 25px;
+            margin: 0 3px;
+            background-color: #444;
+            border-radius: 4px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1 class="page-title">Theaters Management</h1>
+        <button class="btn" id="add-theater-btn">
+            <i class="fas fa-plus"></i> Add New Theater
+        </button>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" class="search-input" placeholder="Search theaters by name or location...">
+        <button class="search-btn"><i class="fas fa-search"></i></button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Address</th>
+                    <th>Screens</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="theaters-table-body">
+                <!-- Theater data will be populated here via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <div class="pagination-item">1</div>
+        <div class="pagination-item active">2</div>
+        <div class="pagination-item">3</div>
+        <div class="pagination-item">Next</div>
+    </div>
+
+    <!-- Add/Edit Theater Modal -->
+    <div class="modal" id="theater-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="theater-modal-title">Add New Theater</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="theater-form">
+                <input type="hidden" id="theater-id">
+                <div class="form-group">
+                    <label class="form-label" for="name">Theater Name</label>
+                    <input type="text" class="form-control" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="location">Location</label>
+                    <input type="text" class="form-control" id="location" required>
+                    <div class="help-text">City or area where the theater is located</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="address">Address</label>
+                    <textarea class="form-control" id="address" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="total-screens">Total Screens</label>
+                    <input type="number" class="form-control" id="total-screens" min="1" value="1" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancel-theater-btn">Cancel</button>
+                    <button type="submit" class="btn" id="save-theater-btn">Save Theater</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Theater Screens Modal -->
+    <div class="modal" id="screens-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 class="modal-title" id="screens-modal-title">Manage Screens</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div id="screens-container">
+                <div class="table-container">
+                    <table class="screens-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Capacity</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="screens-table-body">
+                            <!-- Screen data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <button class="btn btn-sm" id="add-screen-btn" style="margin-top: 15px;">
+                    <i class="fas fa-plus"></i> Add Screen
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" id="close-screens-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Screen Modal -->
+    <div class="modal" id="screen-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="screen-modal-title">Add New Screen</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="screen-form">
+                <input type="hidden" id="screen-id">
+                <input type="hidden" id="screen-theater-id">
+                <div class="form-group">
+                    <label class="form-label" for="screen-name">Screen Name</label>
+                    <input type="text" class="form-control" id="screen-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="capacity">Capacity</label>
+                    <input type="number" class="form-control" id="capacity" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="screen-type">Screen Type</label>
+                    <select class="form-control" id="screen-type" required>
+                        <option value="standard">Standard</option>
+                        <option value="imax">IMAX</option>
+                        <option value="vip">VIP</option>
+                        <option value="3d">3D</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="cancel-screen-btn">Cancel</button>
+                    <button type="submit" class="btn" id="save-screen-btn">Save Screen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Screen Seats Modal -->
+    <div class="modal" id="seats-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 class="modal-title" id="seats-modal-title">Manage Seats</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="seats-form">
+                <input type="hidden" id="seats-screen-id">
+                <div class="form-group">
+                    <label class="form-label" for="rows">Number of Rows</label>
+                    <input type="number" class="form-control" id="rows" min="1" max="26" value="10" required>
+                    <div class="help-text">Maximum 26 rows (A-Z)</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="seats-per-row">Seats per Row</label>
+                    <input type="number" class="form-control" id="seats-per-row" min="1" max="20" value="10" required>
+                </div>
+                <div class="theater-preview">
+                    <div class="screen-label">SCREEN</div>
+                    <div class="screen"></div>
+                    <div id="seats-preview" class="seats-container">
+                        <!-- Seats preview will be generated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="update-preview-btn">Update Preview</button>
+                    <button type="button" class="btn btn-danger" id="cancel-seats-btn">Cancel</button>
+                    <button type="submit" class="btn" id="save-seats-btn">Save Seats</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="delete-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Confirm Delete</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <p id="delete-message">Are you sure you want to delete this theater? All associated screens and seats will also be deleted.</p>
+            <div class="modal-footer">
+                <button type="button" class="btn" id="cancel-delete-btn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample data
+            let theaters = [
+                {
+                    id: 1,
+                    name: "CineMatch Grand Plaza",
+                    location: "Central District",
+                    address: "123 Main Street, Central District",
+                    total_screens: 5,
+                    created_at: "2023-01-15T10:30:00",
+                    screens: [
+                        {
+                            id: 1,
+                            theater_id: 1,
+                            name: "Screen 1",
+                            capacity: 120,
+                            screen_type: "standard"
+                        },
+                        {
+                            id: 2,
+                            theater_id: 1,
+                            name: "IMAX Screen",
+                            capacity: 200,
+                            screen_type: "imax"
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: "CineMatch Premium Mall",
+                    location: "West End",
+                    address: "456 Park Avenue, West End",
+                    total_screens: 3,
+                    created_at: "2023-02-20T14:45:00",
+                    screens: [
+                        {
+                            id: 3,
+                            theater_id: 2,
+                            name: "VIP Screen",
+                            capacity: 60,
+                            screen_type: "vip"
+                        },
+                        {
+                            id: 4,
+                            theater_id: 2,
+                            name: "Screen 2",
+                            capacity: 100,
+                            screen_type: "standard"
+                        }
+                    ]
+                }
+            ];
+
+            // DOM elements
+            const theatersTableBody = document.getElementById('theaters-table-body');
+            const addTheaterBtn = document.getElementById('add-theater-btn');
+            const theaterModal = document.getElementById('theater-modal');
+            const screensModal = document.getElementById('screens-modal');
+            const screenModal = document.getElementById('screen-modal');
+            const seatsModal = document.getElementById('seats-modal');
+            const deleteModal = document.getElementById('delete-modal');
+            const closeModalButtons = document.querySelectorAll('.close-modal');
+            
+            // Form elements
+            const theaterForm = document.getElementById('theater-form');
+            const screenForm = document.getElementById('screen-form');
+            const seatsForm = document.getElementById('seats-form');
+            const cancelTheaterBtn = document.getElementById('cancel-theater-btn');
+            const cancelScreenBtn = document.getElementById('cancel-screen-btn');
+            const cancelSeatsBtn = document.getElementById('cancel-seats-btn');
+            const closeScreensBtn = document.getElementById('close-screens-btn');
+            const addScreenBtn = document.getElementById('add-screen-btn');
+            const updatePreviewBtn = document.getElementById('update-preview-btn');
+
+            // Event listeners
+            addTheaterBtn.addEventListener('click', openAddTheaterModal);
+            closeModalButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+            theaterForm.addEventListener('submit', saveTheater);
+            screenForm.addEventListener('submit', saveScreen);
+            seatsForm.addEventListener('submit', saveSeats);
+            cancelTheaterBtn.addEventListener('click', () => theaterModal.style.display = 'none');
+            cancelScreenBtn.addEventListener('click', () => screenModal.style.display = 'none');
+            cancelSeatsBtn.addEventListener('click', () => seatsModal.style.display = 'none');
+            closeScreensBtn.addEventListener('click', () => screensModal.style.display = 'none');
+            addScreenBtn.addEventListener('click', openAddScreenModal);
+            updatePreviewBtn.addEventListener('click', generateSeatsPreview);
+
+            // Load theaters on page load
+            loadTheaters();
+
+            // Functions
+            function loadTheaters() {
+                theatersTableBody.innerHTML = '';
+                
+                theaters.forEach(theater => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${theater.id}</td>
+                        <td>${theater.name}</td>
+                        <td>${theater.location}</td>
+                        <td>${theater.address}</td>
+                        <td>${theater.total_screens} (${theater.screens ? theater.screens.length : 0} configured)</td>
+                        <td>
+                            <button class="btn btn-sm edit-theater-btn" data-id="${theater.id}">Edit</button>
+                            <button class="btn btn-sm btn-secondary manage-screens-btn" data-id="${theater.id}">Manage Screens</button>
+                            <button class="btn btn-sm btn-danger delete-theater-btn" data-id="${theater.id}">Delete</button>
+                        </td>
+                    `;
+                    
+                    theatersTableBody.appendChild(row);
+                });
+
+                // Add event listeners to action buttons
+                document.querySelectorAll('.edit-theater-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const theaterId = parseInt(this.getAttribute('data-id'));
+                        openEditTheaterModal(theaterId);
+                    });
+                });
+
+                document.querySelectorAll('.manage-screens-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const theaterId = parseInt(this.getAttribute('data-id'));
+                        openManageScreensModal(theaterId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-theater-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const theaterId = parseInt(this.getAttribute('data-id'));
+                        openDeleteTheaterModal(theaterId);
+                    });
+                });
+            }
+
+            function openAddTheaterModal() {
+                // Reset form
+                theaterForm.reset();
+                document.getElementById('theater-id').value = '';
+                document.getElementById('theater-modal-title').textContent = 'Add New Theater';
+                
+                // Show modal
+                theaterModal.style.display = 'flex';
+            }
+            
+            function openEditTheaterModal(theaterId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater) return;
+            
+                // Fill form with theater data
+                document.getElementById('theater-id').value = theater.id;
+                document.getElementById('name').value = theater.name;
+                document.getElementById('location').value = theater.location;
+                document.getElementById('address').value = theater.address;
+                document.getElementById('total-screens').value = theater.total_screens;
+                
+                document.getElementById('theater-modal-title').textContent = 'Edit Theater';
+                
+                // Show modal
+                theaterModal.style.display = 'flex';
+            }
+            
+            function openManageScreensModal(theaterId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater) return;
+                
+                // Set modal title
+                document.getElementById('screens-modal-title').textContent = `Manage Screens - ${theater.name}`;
+                
+                // Load screens for this theater
+                loadScreensTable(theaterId);
+                
+                // Set theater ID for the add screen button
+                addScreenBtn.setAttribute('data-theater-id', theaterId);
+                
+                // Show modal
+                screensModal.style.display = 'flex';
+            }
+            
+            function loadScreensTable(theaterId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater || !theater.screens) return;
+                
+                const screensTableBody = document.getElementById('screens-table-body');
+                screensTableBody.innerHTML = '';
+                
+                theater.screens.forEach(screen => {
+                    const row = document.createElement('tr');
+                    
+                    // Format screen type for display
+                    const screenType = screen.screen_type.charAt(0).toUpperCase() + screen.screen_type.slice(1);
+                    
+                    row.innerHTML = `
+                        <td>${screen.id}</td>
+                        <td>${screen.name}</td>
+                        <td>${screen.capacity}</td>
+                        <td>${screenType}</td>
+                        <td>
+                            <button class="btn btn-sm edit-screen-btn" data-id="${screen.id}" data-theater-id="${theaterId}">Edit</button>
+                            <button class="btn btn-sm btn-secondary manage-seats-btn" data-id="${screen.id}" data-theater-id="${theaterId}">Manage Seats</button>
+                            <button class="btn btn-sm btn-danger delete-screen-btn" data-id="${screen.id}" data-theater-id="${theaterId}">Delete</button>
+                        </td>
+                    `;
+                    
+                    screensTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to screen action buttons
+                document.querySelectorAll('.edit-screen-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const screenId = parseInt(this.getAttribute('data-id'));
+                        const theaterId = parseInt(this.getAttribute('data-theater-id'));
+                        openEditScreenModal(theaterId, screenId);
+                    });
+                });
+                
+                document.querySelectorAll('.manage-seats-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const screenId = parseInt(this.getAttribute('data-id'));
+                        const theaterId = parseInt(this.getAttribute('data-theater-id'));
+                        openManageSeatsModal(theaterId, screenId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-screen-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const screenId = parseInt(this.getAttribute('data-id'));
+                        const theaterId = parseInt(this.getAttribute('data-theater-id'));
+                        openDeleteScreenModal(theaterId, screenId);
+                    });
+                });
+            }
+            
+            function openAddScreenModal() {
+                // Reset form
+                screenForm.reset();
+                
+                // Get theater ID from the add button
+                const theaterId = parseInt(addScreenBtn.getAttribute('data-theater-id'));
+                
+                document.getElementById('screen-id').value = '';
+                document.getElementById('screen-theater-id').value = theaterId;
+                document.getElementById('screen-modal-title').textContent = 'Add New Screen';
+                
+                // Show modal
+                screenModal.style.display = 'flex';
+            }
+            
+            function openEditScreenModal(theaterId, screenId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater || !theater.screens) return;
+                
+                const screen = theater.screens.find(s => s.id === screenId);
+                if (!screen) return;
+                
+                // Fill form with screen data
+                document.getElementById('screen-id').value = screen.id;
+                document.getElementById('screen-theater-id').value = theaterId;
+                document.getElementById('screen-name').value = screen.name;
+                document.getElementById('capacity').value = screen.capacity;
+                document.getElementById('screen-type').value = screen.screen_type;
+                
+                document.getElementById('screen-modal-title').textContent = 'Edit Screen';
+                
+                // Show modal
+                screenModal.style.display = 'flex';
+            }
+            
+            function openManageSeatsModal(theaterId, screenId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater || !theater.screens) return;
+                
+                const screen = theater.screens.find(s => s.id === screenId);
+                if (!screen) return;
+                
+                // Set screen ID in form
+                document.getElementById('seats-screen-id').value = screenId;
+                document.getElementById('seats-modal-title').textContent = `Manage Seats - ${screen.name}`;
+                
+                // For simplicity, we'll assume 10 rows and 10 seats per row as default
+                document.getElementById('rows').value = 10;
+                document.getElementById('seats-per-row').value = 10;
+                
+                // Generate initial seat preview
+                generateSeatsPreview();
+                
+                // Show modal
+                seatsModal.style.display = 'flex';
+            }
+            
+            function generateSeatsPreview() {
+                const rows = parseInt(document.getElementById('rows').value);
+                const seatsPerRow = parseInt(document.getElementById('seats-per-row').value);
+                
+                const seatsPreview = document.getElementById('seats-preview');
+                seatsPreview.innerHTML = '';
+                
+                // Generate seats
+                for (let i = 0; i < rows; i++) {
+                    const rowLetter = String.fromCharCode(65 + i); // A, B, C, ...
+                    
+                    const seatRow = document.createElement('div');
+                    seatRow.className = 'seat-row';
+                    
+                    // Add row label
+                    const rowLabel = document.createElement('div');
+                    rowLabel.className = 'row-label';
+                    rowLabel.textContent = rowLetter;
+                    seatRow.appendChild(rowLabel);
+                    
+                    // Add seats
+                    for (let j = 0; j < seatsPerRow; j++) {
+                        const seat = document.createElement('div');
+                        seat.className = 'seat';
+                        seat.setAttribute('data-row', rowLetter);
+                        seat.setAttribute('data-seat', j + 1);
+                        seatRow.appendChild(seat);
+                    }
+                    
+                    seatsPreview.appendChild(seatRow);
+                }
+            }
+            
+            function openDeleteTheaterModal(theaterId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater) return;
+                
+                document.getElementById('delete-message').textContent = `Are you sure you want to delete "${theater.name}"? All associated screens and seats will also be deleted.`;
+                
+                // Set up delete confirmation
+                const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+                const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+                
+                confirmDeleteBtn.onclick = function() {
+                    deleteTheater(theaterId);
+                    deleteModal.style.display = 'none';
+                };
+                
+                cancelDeleteBtn.onclick = function() {
+                    deleteModal.style.display = 'none';
+                };
+                
+                // Show modal
+                deleteModal.style.display = 'flex';
+            }
+            
+            function openDeleteScreenModal(theaterId, screenId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater || !theater.screens) return;
+                
+                const screen = theater.screens.find(s => s.id === screenId);
+                if (!screen) return;
+                
+                document.getElementById('delete-message').textContent = `Are you sure you want to delete screen "${screen.name}"? All associated seats will also be deleted.`;
+                
+                // Set up delete confirmation
+                const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+                const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+                
+                confirmDeleteBtn.onclick = function() {
+                    deleteScreen(theaterId, screenId);
+                    deleteModal.style.display = 'none';
+                };
+                
+                cancelDeleteBtn.onclick = function() {
+                    deleteModal.style.display = 'none';
+                };
+                
+                // Show modal
+                deleteModal.style.display = 'flex';
+            }
+            
+            function saveTheater(event) {
+                event.preventDefault();
+                
+                // Get form data
+                const theaterId = document.getElementById('theater-id').value;
+                const name = document.getElementById('name').value;
+                const location = document.getElementById('location').value;
+                const address = document.getElementById('address').value;
+                const totalScreens = parseInt(document.getElementById('total-screens').value);
+                
+                if (theaterId) {
+                    // Update existing theater
+                    const index = theaters.findIndex(t => t.id == theaterId);
+                    if (index !== -1) {
+                        theaters[index].name = name;
+                        theaters[index].location = location;
+                        theaters[index].address = address;
+                        theaters[index].total_screens = totalScreens;
+                        
+                        alert('Theater updated successfully!');
+                    }
+                } else {
+                    // Add new theater
+                    const newId = theaters.length > 0 ? Math.max(...theaters.map(t => t.id)) + 1 : 1;
+                    theaters.push({
+                        id: newId,
+                        name: name,
+                        location: location,
+                        address: address,
+                        total_screens: totalScreens,
+                        created_at: new Date().toISOString(),
+                        screens: []
+                    });
+                    
+                    alert('Theater added successfully!');
+                }
+                
+                // Close modal and refresh table
+                theaterModal.style.display = 'none';
+                loadTheaters();
+                
+                // In a real app, send data to the server
+                // saveTheaterToServer(theaterData);
+            }
+            
+            function saveScreen(event) {
+                event.preventDefault();
+                
+                // Get form data
+                const screenId = document.getElementById('screen-id').value;
+                const theaterId = parseInt(document.getElementById('screen-theater-id').value);
+                const name = document.getElementById('screen-name').value;
+                const capacity = parseInt(document.getElementById('capacity').value);
+                const screenType = document.getElementById('screen-type').value;
+                
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater) return;
+                
+                if (!theater.screens) {
+                    theater.screens = [];
+                }
+                
+                if (screenId) {
+                    // Update existing screen
+                    const index = theater.screens.findIndex(s => s.id == screenId);
+                    if (index !== -1) {
+                        theater.screens[index].name = name;
+                        theater.screens[index].capacity = capacity;
+                        theater.screens[index].screen_type = screenType;
+                        
+                        alert('Screen updated successfully!');
+                    }
+                } else {
+                    // Add new screen
+                    const newId = theater.screens.length > 0 
+                        ? Math.max(...theater.screens.map(s => s.id)) + 1 
+                        : 1;
+                        
+                    theater.screens.push({
+                        id: newId,
+                        theater_id: theaterId,
+                        name: name,
+                        capacity: capacity,
+                        screen_type: screenType
+                    });
+                    
+                    alert('Screen added successfully!');
+                }
+                
+                // Close modal and refresh table
+                screenModal.style.display = 'none';
+                loadScreensTable(theaterId);
+                loadTheaters(); // To update the number of screens
+                
+                // In a real app, send data to the server
+                // saveScreenToServer(screenData);
+            }
+            
+            function saveSeats(event) {
+                event.preventDefault();
+                
+                const screenId = parseInt(document.getElementById('seats-screen-id').value);
+                const rows = parseInt(document.getElementById('rows').value);
+                const seatsPerRow = parseInt(document.getElementById('seats-per-row').value);
+                
+                // For this demo, we'll just show a success message
+                alert(`Seat layout for screen ID ${screenId} saved successfully! Created ${rows} rows with ${seatsPerRow} seats each.`);
+                
+                // Close modal
+                seatsModal.style.display = 'none';
+            }
+            
+            function deleteTheater(theaterId) {
+                // Remove theater from array
+                theaters = theaters.filter(theater => theater.id !== theaterId);
+                
+                // Refresh theaters list
+                loadTheaters();
+                
+                alert('Theater deleted successfully!');
+                
+                // In a real app, send delete request to the server
+                // deleteTheaterFromServer(theaterId);
+            }
+            
+            function deleteScreen(theaterId, screenId) {
+                const theater = theaters.find(t => t.id === theaterId);
+                if (!theater || !theater.screens) return;
+                
+                // Remove screen from theater
+                theater.screens = theater.screens.filter(screen => screen.id !== screenId);
+                
+                // Refresh screens list
+                loadScreensTable(theaterId);
+                loadTheaters(); // To update the number of screens
+                
+                alert('Screen deleted successfully!');
+                
+                // In a real app, send delete request to the server
+                // deleteScreenFromServer(screenId);
+            }
+            
+            // API Functions
+            function fetchTheaters() {
+                fetch('/api/theaters')
+                    .then(response => response.json())
+                    .then(data => {
+                        theaters = data;
+                        loadTheaters();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching theaters:', error);
+                    });
+            }
+            
+            function saveTheaterToServer(theaterData) {
+                const url = theaterData.id ? `/api/theaters/${theaterData.id}` : '/api/theaters';
+                const method = theaterData.id ? 'PUT' : 'POST';
+                
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(theaterData),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(theaterData.id ? 'Theater updated successfully!' : 'Theater added successfully!');
+                        fetchTheaters();
+                    })
+                    .catch(error => {
+                        console.error('Error saving theater:', error);
+                        alert('Error saving theater. Please try again.');
+                    });
+            }
+            
+            function deleteTheaterFromServer(theaterId) {
+                fetch(`/api/theaters/${theaterId}`, {
+                    method: 'DELETE',
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Theater deleted successfully!');
+                        fetchTheaters();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting theater:', error);
+                        alert('Error deleting theater. Please try again.');
+                    });
+            }
+            
+            function saveScreenToServer(screenData) {
+                const url = screenData.id ? `/api/screens/${screenData.id}` : '/api/screens';
+                const method = screenData.id ? 'PUT' : 'POST';
+                
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(screenData),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(screenData.id ? 'Screen updated successfully!' : 'Screen added successfully!');
+                        fetchTheaters();
+                    })
+                    .catch(error => {
+                        console.error('Error saving screen:', error);
+                        alert('Error saving screen. Please try again.');
+                    });
+            }
+            
+            function deleteScreenFromServer(screenId) {
+                fetch(`/api/screens/${screenId}`, {
+                    method: 'DELETE',
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Screen deleted successfully!');
+                        fetchTheaters();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting screen:', error);
+                        alert('Error deleting screen. Please try again.');
+                    });
+            }
+            
+            function saveSeatsToServer(seatsData) {
+                fetch('/api/seats', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(seatsData),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Seats saved successfully!');
+                    })
+                    .catch(error => {
+                        console.error('Error saving seats:', error);
+                        alert('Error saving seats. Please try again.');
+                    });
+            }
+            
+            // Initialize by loading theaters from API in a real app
+            // fetchTheaters();
+            });
+    </script>
+</body>
+</html>
