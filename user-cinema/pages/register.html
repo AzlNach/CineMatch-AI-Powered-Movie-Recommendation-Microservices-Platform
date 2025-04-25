@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar - CineWorld</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components/header.css">
+    <link rel="stylesheet" href="../css/components/footer.css">
+    <link rel="stylesheet" href="../css/components/form.css">
+    <link rel="stylesheet" href="../css/components/buttons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="../index.html">Cine<span>World</span></a>
+                </div>
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="../index.html">Beranda</a></li>
+                        <li><a href="movies.html">Film</a></li>
+                        <li><a href="theaters.html">Theater</a></li>
+                        <li><a href="#">Promo</a></li>
+                        <li><a href="#">Kontak</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Auth Buttons (shown when logged out) -->
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login.html" class="btn btn-outline">Masuk</a>
+                    <a href="register.html" class="btn btn-primary">Daftar</a>
+                </div>
+                
+                <!-- User Menu (shown when logged in) -->
+                <div class="user-menu hidden" id="userMenu">
+                    <div class="user-menu-trigger">
+                        <span class="username"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="user-menu-dropdown">
+                        <ul>
+                            <li><a href="profile.html"><i class="fas fa-user"></i> Profil</a></li>
+                            <li><a href="my-tickets.html"><i class="fas fa-ticket-alt"></i> Tiket Saya</a></li>
+                            <li><a href="history.html"><i class="fas fa-history"></i> Riwayat</a></li>
+                            <li><a href="settings.html"><i class="fas fa-cog"></i> Pengaturan</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Keluar</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Register form content here -->
+        <div class="container">
+            <div class="auth-form">
+                <div class="auth-form-container">
+                    <div class="auth-form-header">
+                        <h1 class="auth-form-title">Daftar Akun Baru</h1>
+                        <p class="auth-form-subtitle">Bergabunglah dengan CineWorld untuk pengalaman nonton terbaik</p>
+                    </div>
+                    
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label class="form-label" for="username">Username</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="username" 
+                                   name="username"
+                                   placeholder="Masukkan username" 
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email"
+                                   placeholder="Masukkan email" 
+                                   required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password"
+                                   placeholder="Masukkan password" 
+                                   required>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                Saya setuju dengan <a href="#">Syarat & Ketentuan</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">Daftar Sekarang</button>
+                    </form>
+                    
+                    <div class="auth-form-footer">
+                        <p>Sudah punya akun? <a href="login.html">Masuk di sini</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Same footer as login.html -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo">Cine<span>World</span></div>
+                    <p>Pengalaman nonton bioskop terbaik dengan kualitas gambar dan suara premium.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h3>Menu</h3>
+                        <ul>
+                            <li><a href="../index.html">Beranda</a></li>
+                            <li><a href="movies.html">Film</a></li>
+                            <li><a href="theaters.html">Theater</a></li>
+                            <li><a href="#">Promo</a></li>
+                            <li><a href="#">Kontak</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Info</h3>
+                        <ul>
+                            <li><a href="#">Tentang Kami</a></li>
+                            <li><a href="#">Karir</a></li>
+                            <li><a href="#">Kebijakan Privasi</a></li>
+                            <li><a href="#">Syarat & Ketentuan</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Kontak</h3>
+                        <ul>
+                            <li>Email: info@cineworld.com</li>
+                            <li>Telepon: (021) 123-4567</li>
+                            <li>Alamat: Jl. Sudirman No.123, Jakarta Pusat</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CineWorld. All rights reserved.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script type="module">
+        import { updateUserInterface, checkLoginState, handleLogout } from '../js/auth/auth.js';
+
+        // Initialize logout handler
+        document.getElementById('logoutButton')?.addEventListener('click', handleLogout);
+        
+        // Check login state when page loads
+        document.addEventListener('DOMContentLoaded', checkLoginState);
+
+        // Handle register form submission
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch('http://localhost:3001/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Registrasi berhasil! Silakan login.');
+                    window.location.href = 'login.html';
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Registrasi gagal!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat registrasi');
+            }
+        });
+    </script>
+</body>
+</html>

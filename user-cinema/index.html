@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineWorld - Pengalaman Nonton Terbaik</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components/header.css">
+    <link rel="stylesheet" href="css/components/footer.css">
+    <link rel="stylesheet" href="css/components/buttons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="index.html">Cine<span>World</span></a>
+                </div>
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="index.html">Beranda</a></li>
+                        <li><a href="pages/movies.html">Film</a></li>
+                        <li><a href="pages/theaters.html">Theater</a></li>
+                        <li><a href="#">Promo</a></li>
+                        <li><a href="#">Kontak</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Auth Buttons (shown when logged out) -->
+                <div class="auth-buttons" id="authButtons">
+                    <a href="pages/login.html" class="btn btn-outline">Masuk</a>
+                    <a href="pages/register.html" class="btn btn-primary">Daftar</a>
+                </div>
+                
+                <!-- User Menu (shown when logged in) -->
+                <div class="user-menu hidden" id="userMenu">
+                    <div class="user-menu-trigger">
+                        <span class="username"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="user-menu-dropdown">
+                        <ul>
+                            <li><a href="pages/profile.html"><i class="fas fa-user"></i> Profil</a></li>
+                            <li><a href="pages/my-tickets.html"><i class="fas fa-ticket-alt"></i> Tiket Saya</a></li>
+                            <li><a href="pages/history.html"><i class="fas fa-history"></i> Riwayat</a></li>
+                            <li><a href="pages/settings.html"><i class="fas fa-cog"></i> Pengaturan</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Keluar</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Pengalaman Nonton Bioskop Terbaik</h1>
+                    <p>Nikmati film-film terbaru dengan kualitas gambar dan suara terbaik di theater kami</p>
+                    <div class="hero-buttons">
+                        <a href="pages/movies.html" class="btn btn-primary btn-lg">Lihat Film</a>
+                        <a href="pages/theaters.html" class="btn btn-secondary btn-lg">Cari Theater</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Now Playing Section -->
+        <section class="now-playing">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Sedang Tayang</h2>
+                    <a href="pages/movies.html" class="btn btn-text">Lihat Semua</a>
+                </div>
+                <div class="movie-cards">
+                    <!-- Movie cards will be populated by JavaScript -->
+                    <div class="movie-card">
+                        <div class="movie-poster">
+                            <img src="assets/images/movies/movie1.jpg" alt="Movie 1">
+                            <div class="movie-rating">8.5</div>
+                        </div>
+                        <div class="movie-info">
+                            <h3>Judul Film 1</h3>
+                            <p class="movie-genre">Action, Adventure</p>
+                            <a href="pages/movie-details.html?id=1" class="btn btn-primary btn-sm">Beli Tiket</a>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster">
+                            <img src="assets/images/movies/movie2.jpg" alt="Movie 2">
+                            <div class="movie-rating">7.8</div>
+                        </div>
+                        <div class="movie-info">
+                            <h3>Judul Film 2</h3>
+                            <p class="movie-genre">Comedy, Romance</p>
+                            <a href="pages/movie-details.html?id=2" class="btn btn-primary btn-sm">Beli Tiket</a>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster">
+                            <img src="assets/images/movies/movie3.jpg" alt="Movie 3">
+                            <div class="movie-rating">9.0</div>
+                        </div>
+                        <div class="movie-info">
+                            <h3>Judul Film 3</h3>
+                            <p class="movie-genre">Horror, Thriller</p>
+                            <a href="pages/movie-details.html?id=3" class="btn btn-primary btn-sm">Beli Tiket</a>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster">
+                            <img src="assets/images/movies/movie4.jpg" alt="Movie 4">
+                            <div class="movie-rating">8.2</div>
+                        </div>
+                        <div class="movie-info">
+                            <h3>Judul Film 4</h3>
+                            <p class="movie-genre">Sci-Fi, Action</p>
+                            <a href="pages/movie-details.html?id=4" class="btn btn-primary btn-sm">Beli Tiket</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Theaters Section -->
+        <section class="theaters-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Theater Kami</h2>
+                    <a href="pages/theaters.html" class="btn btn-text">Lihat Semua</a>
+                </div>
+                <div class="theater-cards">
+                    <div class="theater-card">
+                        <img src="assets/images/theaters/theater1.jpg" alt="Theater 1">
+                        <div class="theater-info">
+                            <h3>Cinema 1</h3>
+                            <p>Jl. M.H. Thamrin No.1, Jakarta Pusat</p>
+                            <a href="pages/theaters.html?id=1" class="btn btn-outline btn-sm">Lihat Detail</a>
+                        </div>
+                    </div>
+                    <div class="theater-card">
+                        <img src="assets/images/theaters/theater2.jpg" alt="Theater 2">
+                        <div class="theater-info">
+                            <h3>CineWorld Senayan City</h3>
+                            <p>Jl. Asia Afrika No.19, Jakarta Selatan</p>
+                            <a href="pages/theaters.html?id=2" class="btn btn-outline btn-sm">Lihat Detail</a>
+                        </div>
+                    </div>
+                    <div class="theater-card">
+                        <img src="assets/images/theaters/theater3.jpg" alt="Theater 3">
+                        <div class="theater-info">
+                            <h3>CineWorld Bandung Indah Plaza</h3>
+                            <p>Jl. Merdeka No.56, Bandung</p>
+                            <a href="pages/theaters.html?id=3" class="btn btn-outline btn-sm">Lihat Detail</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Promo Section -->
+        <section class="promo-section">
+            <div class="container">
+                <div class="promo-content">
+                    <h2>Daftar Sekarang dan Dapatkan Diskon 20%</h2>
+                    <p>Untuk pembelian tiket pertama Anda di CineWorld</p>
+                    <a href="pages/register.html" class="btn btn-primary btn-lg">Daftar Sekarang</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo">Cine<span>World</span></div>
+                    <p>Pengalaman nonton bioskop terbaik dengan kualitas gambar dan suara premium.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h3>Menu</h3>
+                        <ul>
+                            <li><a href="index.html">Beranda</a></li>
+                            <li><a href="pages/movies.html">Film</a></li>
+                            <li><a href="pages/theaters.html">Theater</a></li>
+                            <li><a href="#">Promo</a></li>
+                            <li><a href="#">Kontak</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Info</h3>
+                        <ul>
+                            <li><a href="#">Tentang Kami</a></li>
+                            <li><a href="#">Karir</a></li>
+                            <li><a href="#">Kebijakan Privasi</a></li>
+                            <li><a href="#">Syarat & Ketentuan</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Kontak</h3>
+                        <ul>
+                            <li>Email: info@cineworld.com</li>
+                            <li>Telepon: (021) 123-4567</li>
+                            <li>Alamat: Jl. Sudirman No.123, Jakarta Pusat</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CineWorld. All rights reserved.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
+    <script type="module">
+        import { updateUserInterface, checkLoginState, handleLogout } from './js/auth/auth.js';
+
+        // Initialize logout handler
+        document.getElementById('logoutButton')?.addEventListener('click', handleLogout);
+        
+        // Check login state when page loads
+        document.addEventListener('DOMContentLoaded', checkLoginState);
+    </script>
+
+</body>
+</html>
